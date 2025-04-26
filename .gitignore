@@ -1,0 +1,12 @@
+# Ignore configuration files
+config.json
+config.ini
+secrets.py
+__pycache__/
+*.pyc
+.env
+venv/
+*.egg-info/
+.vscode/
+ML_models/models/bidirectionalLSTM.h5
+test/

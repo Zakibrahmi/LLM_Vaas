@@ -1,0 +1,62 @@
+query_refinement_task:
+  description: >
+    Analyze the user's travel query  {query} and extract the following parameters as JSON:
+    - origin (string or null)
+    - destination (string or null)
+    - constraints (array of paire (type, value))
+    
+    RULES:
+    1. Return null for missing info
+    2. Never invent data
+    3. Use this exact JSON structure:
+    ```json
+     {
+        "origin": "string|null (departure city)",
+        "destination": "string|null (destination city)",
+        "departure_time": "string|null (departure time)"
+        "constraints": [
+         {
+         "type": "string (e.g. 'budget', 'date')",
+         "value": "string (e.g. '<1000', 'next week')"
+         }
+     ]
+    }
+    ```
+    EXAMPLES:
+    Input: "Fly from Paris to Tokyo"
+    Output:
+    ```json
+    {"origin": "Paris", "destination": "Tokyo", "constraints": []}
+    ```
+    
+    Input: "Vacation under $1000"
+    Output:
+    ```json
+    {"origin": null, "destination": null, "constraints": ["budget<1000"]}
+    ```
+
+  expected_output: |
+    PURE JSON output with the 3 required fields.
+    No additional text or formatting outside the JSON.
+  output_json: true  # Forces JSON output if available
+
+analysis_task:
+  description: >
+    Analyze our time series data by extracting {num_samples} records 
+    immediately before {target_datetime}. Use the '{column}' column for timestamps.
+  expected_output: > 
+    Structured results with only data formatted as Dataframe format",
+    agent=data_analyst,
+  inputs: > 
+      {
+        "datetime_column": "{column}",  
+        "reference_datetime": "{target_datetime}",
+        "num_samples": "{num_samples}"
+      }
+ml_prediction_task:
+  description: >
+      Take the time series data from the previous analysis formatted as DataFrame. 
+      The input will be the output from the analysis_task.
+  expected_output: > 
+      forcated trafic volume
+  

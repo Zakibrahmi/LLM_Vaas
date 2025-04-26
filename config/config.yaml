@@ -1,0 +1,12 @@
+Huggingface:
+  key: "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"
+  model: "ollama"
+  timeout: 30
+  temperature: 0.7
+OpenAI:
+  key: "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"
+  model: "openai/gpt-4"
+  timeout: 30
+  temperature: 0.7
+MLModel_path: "./ML_models/models/bidirectionalLSTM.h5"
+data_path: "./data/MITVolume_cleaned.csv"

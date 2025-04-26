@@ -1,0 +1,8 @@
+huggingface_hub
+request
+crewai
+matplotlib
+seaborn
+tensorflow
+keras
+crewai-tools

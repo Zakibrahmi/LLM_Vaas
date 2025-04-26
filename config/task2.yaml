@@ -1,0 +1,70 @@
+query_refinement_task:
+  description: >
+    Conduct interactive refinement of trip {Query} through contextual dialogue, 
+    user profile analysis, and APIs. Process each request by:
+    
+    1. Extracting core parameters (origin, destination, time, constraints)
+    2. Validating against current network capabilities
+    3. Consulting user's travel history and preferences
+    4. Generating natural language responses that:
+       - Propose feasible alternatives for impossible constraints
+       - Request missing essential information
+       - Personalize based on historical behavior
+    
+    Examples:    
+    Example 1: Immediate Booking
+    User Query: "Need a ride to the hospital now"
+    Context: { preferred_vehicle: "sedan", avg_response_time: 12min }
+    Analysis:
+      - Missing: precise origin location
+      - Network: 8min fastest response time
+    Refined Output: >
+      "We can dispatch a sedan to your location within 8 minutes. 
+      Please share your exact pickup address to confirm."
+    
+    Example 2: Capacity Constraint
+    User Query: "Luxury van for 8 people Friday night"
+    Context: { budget_limit: 120, past_rejections: ["minivans"] }
+    Analysis:
+      - Impossible: No luxury vans for 8
+      - Alternative: Two premium SUVs (seats 4+4)
+    Refined Output: >
+      "Our closest option is two premium SUVs with synchronized routing ($110 total).
+      This matches your budget and avoids minivans. Shall I proceed?"
+    
+    Example 3: Multi-Modal Trip
+    User Query: "Get me downtown by 9AM without traffic"
+    Context: { frequent_routes: ["home->downtown"], prefers_electric: true }
+    Analysis:
+      - Optimal: E-bike + metro combination
+      - Time: 38min guaranteed
+    Refined Output: >
+      "Recommend taking our priority e-bike to Central Station (12min),
+      then express metro (26min). Arrival by 8:50AM. Electric throughout.
+      Should I reserve both segments?"
+    
+    Example 4: Budget Negotiation
+    User Query: "Airport transfer under $30"
+    Context: { usual_spend: 45, last_airport_trip: "shared_ride" }
+    Analysis:
+      - Impossible: Minimum $35 for private transfer
+      - Alternative: Shared ride at $25
+    Refined Output: >
+      "Your preferred private transfer starts at $35. However, I found a
+      shared ride option at $25 (similar to your last trip). Which would
+      you prefer?"
+
+  expected_output: >
+    A verified and enhanced query containing:
+    1. All mandatory parameters (origin, destination, time)
+    2. Adjusted constraints (budget, capacity, etc.)
+    3. Injected preferences (from patterns/profile)
+    4. Network-validated timings
+    Formatted as: "[Enhanced] <natural language query>"
+
+    Sample Outputs:
+    - "[Enhanced] Premium SUV from Central Station to Airport at 7:30AM (your usual Thursday ride)"
+    - "[Enhanced] Two EVs for 6 people with child seats (adjusted from original request)"
+    - "[Enhanced] Downtown arrival by 9:15AM via express lane (traffic-adjusted)"
+  async_execution: false
+  human_input: true

@@ -1,0 +1,9 @@
+To acitvate virtual env: .\venv\Scripts\activate
+huggingface: Ilyes123456789!
+
+to create modular apporach, where each agent and task is a python class:
+     https://docs.crewai.com/how-to/mlflow-observability
+     
+code agent using crewAi: https://docs.crewai.com/how-to/coding-agents
+
+To evaluate agent in crewAI: https://docs.crewai.com/how-to/openlit-observability#setup-using-function-arguments
