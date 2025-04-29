@@ -1,44 +1,131 @@
 query_refinement_task:
   description: >
-    Analyze the user's travel query  {query} and extract the following parameters as JSON:
+    Analyze the user's travel query {query} and extract the following parameters as JSON:
     - origin (string or null)
     - destination (string or null)
-    - constraints (array of paire (type, value))
-    
+    - departure_time (string or null)
+    - constraints (array of objects with 'type' and 'value')
+
     RULES:
-    1. Return null for missing info
-    2. Never invent data
-    3. Use this exact JSON structure:
+    1. Return null (not None) for any missing information (e.g., if the user did not specify an origin, return "origin": null).
+    2. Never invent or assume missing data.
+    2. If you detect an impossible or unrealistic request (e.g., budget less than $1, flight within the same city), set the corresponding field or constraint value to "unrealistic".
+    4. Respect the exact JSON structure:
+    
     ```json
-     {
-        "origin": "string|null (departure city)",
-        "destination": "string|null (destination city)",
-        "departure_time": "string|null (departure time)"
-        "constraints": [
-         {
-         "type": "string (e.g. 'budget', 'date')",
-         "value": "string (e.g. '<1000', 'next week')"
-         }
-     ]
+    {
+      "origin": "string|null|unrealistic",
+      "destination": "string|null|unrealistic",
+      "departure_time": "string|null|unrealistic",
+      "constraints": [
+        {
+          "type": "string (e.g., 'budget', 'date')",
+          "value": "string|null|unrealistic"
+        }
+      ]
     }
     ```
-    EXAMPLES:
+    EXAMPLES:    
+
+    Example 1:
     Input: "Fly from Paris to Tokyo"
+
     Output:
     ```json
-    {"origin": "Paris", "destination": "Tokyo", "constraints": []}
+    {
+      "origin": "Paris",
+      "destination": "Tokyo",
+      "departure_time": null,
+      "constraints": []
+    }
     ```
-    
+
+    Example 2:
     Input: "Vacation under $1000"
+    
+    Output:
+
+    ```json
+    {
+      "origin": null,
+      "destination": null,
+      "departure_time": null,
+      "constraints": [
+        {
+          "type": "budget",
+          "value": "<1000"
+        }
+      ]
+    }
+    ```
+    Example 3:
+
+    Input: "Flight from New York to London next week"  
+
     Output:
     ```json
-    {"origin": null, "destination": null, "constraints": ["budget<1000"]}
+    {
+      "origin": "New York",
+      "destination": "London",
+      "departure_time": "next week",
+      "constraints": []
+    }
+    ```
+    Input: "Travel to Dubai with Emirates Airlines"    
+
+    Output:
+    ```json
+    {
+      "origin": null,
+      "destination": "Dubai",
+      "departure_time": null,
+      "constraints": [
+        {
+          "type": "airline",
+          "value": "Emirates Airlines"
+        }
+      ]
+    }
+    ```
+    Example 4:
+    Input: "Depart from Riyadh to Jeddah before Ramadan"
+    
+    Output:
+    ```json
+    {
+      "origin": "Riyadh",
+      "destination": "Jeddah",
+      "departure_time": "before Ramadan",
+      "constraints": []
+    }
+    ```
+    Example 5:
+    Input: "Book a flight from Dammam to Cairo next month, under $10, using Qatar Airways"
+    
+    Output:
+    ```json
+    {
+      "origin": "Dammam",
+      "destination": "Cairo",
+      "departure_time": "next month",
+      "constraints": [
+        {
+          "type": "budget",
+          "value": "unrealistic"
+        },
+        {
+          "type": "airline",
+          "value": "Qatar Airways"
+        }
+      ]
+    }
     ```
 
   expected_output: |
-    PURE JSON output with the 3 required fields.
-    No additional text or formatting outside the JSON.
-  output_json: true  # Forces JSON output if available
+    Return PURE JSON output strictly following the required fields.
+    No additional explanation or formatting outside the JSON.
+
+  output_json: true
 
 analysis_task:
   description: >

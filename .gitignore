@@ -9,4 +9,4 @@ venv/
 *.egg-info/
 .vscode/
 ML_models/models/bidirectionalLSTM.h5
-test/
+test/bidirectionalLSTM.h5

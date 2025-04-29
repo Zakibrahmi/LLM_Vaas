@@ -9,6 +9,7 @@ coordinator:
     before proceeding with any bookings or recommendations.
   allow_delegation: false
   verbose: true
+  
 smartScope: 
   role: >
     Time Series Analyst

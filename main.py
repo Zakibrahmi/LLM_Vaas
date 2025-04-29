@@ -6,6 +6,7 @@ from textwrap import dedent
 from task_VaaS import *
 from vaas_agents import *
 from tools.scope_agent_toosl import *
+from shemas.shemas import *
 
 class VaaSCrew:
     def __init__(self, query: str=None):
@@ -14,11 +15,22 @@ class VaaSCrew:
     def run(self) -> Dict[str, Any]:
         agents = VaaSAgents()
         tasks = VaaSTasks()
-
-        #coordinator_agent = agents.create_agent(name_agent="coordinator")
-        # Task for coordinator agent
-        #query_task = tasks.create_task(task_name= "query_refinement_task", agent=coordinator_agent, agent_name='coordinator')
         
+        # Agent coordiator 
+        coordinator_agent = agents.create_agent(agent_name="coordinator")
+        # Task for coordinator agent
+        query_task = tasks.create_task(task_name= "query_refinement_task", agent=coordinator_agent, output=QueryAnalysisOutput)
+
+        crew = Crew(
+            agents=[coordinator_agent],
+            tasks=[query_task]
+        )
+        result = crew.kickoff(inputs={"query": "I want to travel to Jeddah under 5 Riyals"})
+
+        print("Analysis Results:")
+        print(result)
+        
+        """
         # SmartScope Agent. Responsable on extract relavant regions and VaaS to user query
         extract_samples_tool = ExtractSamplesTool()
         ml_model_tool = MLModelTool()
@@ -49,7 +61,7 @@ class VaaSCrew:
         print(result)
         
        # return coordinator_agent.last_step_output
-
+       """
 
 if __name__ == "__main__":
     v = VaaSCrew()

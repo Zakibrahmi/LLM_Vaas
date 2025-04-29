@@ -23,7 +23,7 @@ class VaaSTasks:
         """
         self.tasks_config = load_config(config_path)
     
-    def create_task(self, task_name: str, agent: Agent, agent_name=None) -> Task:
+    def create_task(self, task_name: str, agent: Agent, output = None, agent_name=None) -> Task:
         """Factory method to create any configured task"""
         if task_name not in self.tasks_config:
             raise ValueError(f"Task '{task_name}' not found in config")
@@ -33,7 +33,8 @@ class VaaSTasks:
         return Task(
             config=config,
             agent=agent,
-            guardrail=self.validate_json_output if agent_name == 'coordinator' else None            
+            output_json= output
+            #guardrail=self.validate_json_output if agent_name == 'coordinator' else None            
         )
 
    
