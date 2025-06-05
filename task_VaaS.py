@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from typing import Dict, Optional, List, Set, Tuple, Union
 import json
 from utils.models import *
-
+from shemas.shemas import *
 class VaaSTasks:
     def __init__(self, config_path: str = 'config/tasks.yaml'):
         """
@@ -33,8 +33,7 @@ class VaaSTasks:
         return Task(
             config=config,
             agent=agent,
-            output_json= output
-            #guardrail=self.validate_json_output if agent_name == 'coordinator' else None            
+            output_json= output            #guardrail=self.validate_json_output if agent_name == 'coordinator' else None            
         )
 
    
@@ -49,19 +48,26 @@ class VaaSTasks:
             raise ValueError(f"Missing context variable {str(e)} in task description")
     
     def validate_json_output(result: str) -> Tuple[bool, Union[dict, str]]:
-        """Validate that the output is valid JSON."""
-        missing = []
+        """Validate and sanitize JSON output"""
         try:
-            data = json.loads(result)
-            if data["origine"] is None:
-                missing.appende('origine')
-            if data['destination'] is None:
-                missing.appende('destination')
-            if data["departure_time"] is None:
-                missing.appende('departure_time')
-            if not data["constraints"]:
-                missing.appende('constraints')
+            # Remove markdown and fix common errors
+            sanitized = (
+                result.strip()
+                .replace('```json', '')
+                .replace('```', '')
+                .replace("'", '"')
+                .replace("None", "null")
+            )
             
-            return (True, f'These information are missed: {missing}')
-        except json.JSONDecodeError:
-            return (False, "Output must be valid JSON")
+            # Add missing closing brackets if needed
+            if sanitized.count('[') > sanitized.count(']'):
+                sanitized += ']'
+            if sanitized.count('{') > sanitized.count('}'):
+                sanitized += '}'
+                
+            data = json.loads(sanitized)
+            return True, data
+        except json.JSONDecodeError as e:
+            return False, f"Invalid JSON: {str(e)}"
+        except Exception as e:
+            return False, f"Validation error: {str(e)}"

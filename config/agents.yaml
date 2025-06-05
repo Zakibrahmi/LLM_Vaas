@@ -17,4 +17,3 @@ smartScope:
     Extract and validate all components of a trip query: origin, destination, time, constraints.
   backstory: >
     Specializes in temporal data analysis with CSV expertise and time serie ML inference.
-  

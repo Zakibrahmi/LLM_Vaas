@@ -1,91 +1,96 @@
-from crewai import Agent, Crew, Task
-from typing import Dict, Any
-import yaml
+from crewai import Crew, CrewOutput
+from task_VaaS import VaaSTasks
+from vaas_agents import VaaSAgents
+from shemas.shemas import QueryAnalysisOutput, UserFeedbackOutput, FinalQueryOutput
 import json
-from textwrap import dedent
-from task_VaaS import *
-from vaas_agents import *
-from tools.scope_agent_toosl import *
-from shemas.shemas import *
+
 
 class VaaSCrew:
-    def __init__(self, query: str=None):
+    def __init__(self, query: str):
         self.query = query
 
-    def run(self) -> Dict[str, Any]:
+    def extract(self) -> dict:
         agents = VaaSAgents()
         tasks = VaaSTasks()
-        
-        # Agent coordiator 
-        coordinator_agent = agents.create_agent(agent_name="coordinator")
-        # Task for coordinator agent
-        query_task = tasks.create_task(task_name= "query_refinement_task", agent=coordinator_agent, output=QueryAnalysisOutput)
+        coord = agents.create_agent(agent_name="coordinator")
+
+        query_task = tasks.create_task(
+            task_name="query_refinement_task",
+            agent=coord,
+            output=QueryAnalysisOutput
+        )
 
         crew = Crew(
-            agents=[coordinator_agent],
-            tasks=[query_task]
+            agents=[coord],
+            tasks=[query_task],
+            verbose=False
         )
-        result = crew.kickoff(inputs={"query": "I want to travel to Jeddah under 5 Riyals"})
+        result: CrewOutput = crew.kickoff(inputs={"query": self.query})
+        return result.tasks_output[0].json_dict
 
-        print("Analysis Results:")
-        print(result)
-        
-        """
-        # SmartScope Agent. Responsable on extract relavant regions and VaaS to user query
-        extract_samples_tool = ExtractSamplesTool()
-        ml_model_tool = MLModelTool()
-        SmartScope_Agent= agents.create_agent(agent_name="smartScope", tools=[extract_samples_tool,ml_model_tool])
-        analysis_task= tasks.create_task(task_name="analysis_task", 
-                                      agent=SmartScope_Agent, 
-                                      agent_name="smartScope"                                                                            
-                                      )
-        ml_prediction_task = tasks.create_task(task_name="ml_prediction_task", 
-                                      agent=SmartScope_Agent, 
-                                      agent_name="smartScope"                                                                            
-                                      )
-        ml_prediction_task.async_execution=False
-        ml_prediction_task.context = [analysis_task]
-       
-        
-        crew = Crew(
-            agents=[SmartScope_Agent],
-            tasks=[analysis_task, ml_prediction_task]
+    def feedback(self, partial: dict) -> dict:
+        agents = VaaSAgents()
+        tasks = VaaSTasks()
+        coord = agents.create_agent(agent_name="coordinator")
+
+        fb_task = tasks.create_task(
+            task_name="user_feedback_task",
+            agent=coord,
+            output=UserFeedbackOutput
         )
-        result = crew.kickoff(inputs={
-            "target_datetime": "2018-08-03 20:00:00",
-            "num_samples": 5,
-            "column": "date_time"  # Can be changed to other timestamp columns
+
+        crew = Crew(
+            agents=[coord],
+            tasks=[fb_task],
+            verbose=False
+        )
+        result: CrewOutput = crew.kickoff(inputs={"analysis_output": partial})
+        return result.json_dict
+
+    def finalize(self, extracted: dict, feedback: dict) -> dict:
+        agents = VaaSAgents()
+        tasks = VaaSTasks()
+        coord = agents.create_agent(agent_name="coordinator")
+
+        final_task = tasks.create_task(
+            task_name="finalize_query_task",
+            agent=coord,
+            output=FinalQueryOutput
+        )
+
+        crew = Crew(
+            agents=[coord],
+            tasks=[final_task],
+            verbose=False
+        )
+        result: CrewOutput = crew.kickoff(inputs={
+            "analysis_output": extracted,
+            "feedback_output": feedback
         })
-
-        print("Analysis Results:")
-        print(result)
-        
-       # return coordinator_agent.last_step_output
-       """
+        return result.json_dict
 
 if __name__ == "__main__":
-    v = VaaSCrew()
-    v.run()
+    raw = input("✈️  Dites-moi votre requête de voyage : ")
+    shell = VaaSCrew(raw)
 
-    """
-    test_queries = [
-        "I want to go to Berlin next month",
-        "Find me flights under $500",
-        "From Madrid to Rome with pet accommodation"
-    ]
-    
-    for query in test_queries:
-        print(f"\n{'='*50}\nProcessing query: '{query}'\n{'='*50}")
-        crew = VaaSCrew(query)
-        result = crew.run()
-        
-        print("\nExtracted Data:")
-        print(json.dumps(result.get('extracted_data', {}), indent=2))
-        
-        if messages := result.get('validation_messages', []):
-            print("\nMissing Information:")
-            for msg in messages:
-                print(f"- {msg}")
-        else:
-            print("\nAll required information is complete!")
-    """
+    # Étape 1 : Extraction automatique de la requête
+    extracted = shell.extract()
+
+    # Étape 2 : Détection des infos manquantes ou irréalistes
+    feedback_output = shell.feedback(extracted)
+
+    # Étape 3 : Interaction terminale pour compléter les infos
+    responses = {}
+    for field, question in zip(feedback_output["missing_or_unrealistic_fields"], feedback_output["messages"]):
+        answer = input(f"❓ {question} ")
+        responses[field] = answer
+    feedback_output["responses"] = responses
+
+    print("\n📋 Résultat complet de user_feedback_task :")
+    print(json.dumps(feedback_output, indent=2, ensure_ascii=False))
+
+    # Étape 4 : Fusion finale des infos dans un JSON complet
+    final_result = shell.finalize(extracted, feedback_output)
+
+    print("\n✅ Requête structurée complète :")
+    print(json.dumps(final_result, indent=2, ensure_ascii=False))
