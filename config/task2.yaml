@@ -68,3 +68,315 @@ query_refinement_task:
     - "[Enhanced] Downtown arrival by 9:15AM via express lane (traffic-adjusted)"
   async_execution: false
   human_input: true
+
+
+analysis_task:
+  description: >
+    Analyze our time series data by extracting {num_samples} records 
+    immediately before {target_datetime}. Use the '{column}' column for timestamps.
+  expected_output: > 
+    Structured results with only data formatted as Dataframe format",
+    agent=data_analyst,
+  inputs: > 
+      {
+        "datetime_column": "{column}",  
+        "reference_datetime": "{target_datetime}",
+        "num_samples": "{num_samples}"
+      }
+ml_prediction_task:
+  description: >
+      Take the time series data from the previous analysis formatted as DataFrame. 
+      The input will be the output from the analysis_task.
+  expected_output: > 
+      forcated trafic volume
+
+
+query_refinement_task:
+  description: >
+    Analyse la requête de voyage de l’utilisatrice {query} et extrait les paramètres suivants au format JSON.
+    Ignorez tout préfixe comme “vol”, “flight”, “je veux un vol” :
+    - origin (string|null|unrealistic)
+    - destination (string|null|unrealistic)
+    - departure_time (string|null|unrealistic)
+    - constraints (liste d’objets {type, value})
+
+    RULES :
+    1. Retournez **null** (pas None) pour toute information manquante (par ex. si l’utilisatrice ne précise pas l’origine).
+    2. Ne jamais inventer ni supposer une donnée.
+    3. Si l’utilisatrice mentionne un **temps relatif** (ex. “aujourd’hui”, “demain”, “ce soir”, “1er juin à 20h” sans année), **gardez exactement cette chaîne** (ex. "demain à 20h" ou "1er juin à 20h"), sans ajouter d’année.  
+       **Si** une date explicite inclut déjà une année (ex. “2023-06-01T20:00:00” ou “12 février 2024”), jugez-la “unrealistic” si elle est passée.
+    4. Si vous détectez une demande impossible ou irréaliste (ex. vol dans la même ville, budget trop bas pour le trajet, condition incohérente), **placez la valeur correspondante à `"unrealistic"`**.  
+       — Cela s’applique aussi aux contraintes ! Exemples :
+         - “1 euro” pour un vol long courrier = `"unrealistic"`
+         - “prise électrique” en vélo partagé = `"unrealistic"`
+         - “compagnie Ryanair” pour un vol Rabat–Tokyo = `"unrealistic"`
+       — Vous devez **raisonner comme une experte du transport**, en utilisant vos connaissances des tarifs, distances, modes, villes, compagnies.
+    5. Toute préférence, exigence ou condition exprimée par l’utilisatrice qui **n’est pas** l’un des trois champs principaux (`origin`, `destination`, `departure_time`) **doit être considérée comme une contrainte**.  
+      — Ne classez pas ces contraintes selon une liste prédéfinie. Utilisez un **type librement choisi** à partir de l’expression d’origine.  
+      — Par exemple, “wifi”, “vélo accepté”, “prise électrique”, “bagage en soute”, “flexible” sont toutes valides comme contraintes, chacune avec son propre `type` et `value`.  
+
+    7. Respectez strictement la structure JSON suivante :
+
+    {
+      "origin": "string|null|unrealistic",
+      "destination": "string|null|unrealistic",
+      "departure_time": "string|null|unrealistic",
+      "constraints": [
+        {
+          "type": "string (ex. 'budget', 'pet', 'transport_mode', 'airline', 'class', etc.)",
+          "value": "string|null|unrealistic"
+        }
+      ]
+    }
+
+    CRITICAL FORMAT RULES :
+    1. Le JSON doit contenir **tous** les crochets fermants (`]` et `}`).
+    2. Aucun formatage Markdown (pas de ```json).
+    3. Validez votre JSON sur https://jsonlint.com avant d’envoyer.
+
+    EXEMPLES :
+    - Input : "Business class flight to Tokyo with $5000 budget"  
+      Output :
+      {
+        "origin": null,
+        "destination": "Tokyo",
+        "departure_time": null,
+        "constraints": [
+          { "type": "budget", "value": "5000" },
+          { "type": "class", "value": "Business" }
+        ]
+      }
+
+    - Input : "Flight from Earth to the Moon"  
+      Output :
+      {
+        "origin": "unrealistic",
+        "destination": "unrealistic",
+        "departure_time": null,
+        "constraints": []
+      }
+
+    - Input : "Travel to Paris yesterday"  
+      Output :
+      {
+        "origin": null,
+        "destination": "Paris",
+        "departure_time": "unrealistic",
+        "constraints": []
+      }
+
+    - Input : "Flight from Dubai to Dubai"  
+      Output :
+      {
+        "origin": "Dubai",
+        "destination": "unrealistic",
+        "departure_time": null,
+        "constraints": []
+      }
+
+    - Input : "I want to go from Riyadh to Madrid tomorrow morning"  
+      Output :
+      {
+        "origin": "Riyadh",
+        "destination": "Madrid",
+        "departure_time": "tomorrow morning",
+        "constraints": []
+      }
+
+    - Input : "Book a flight from Dammam to Cairo next month, under $10, using Qatar Airways"  
+      Output :
+      {
+        "origin": "Dammam",
+        "destination": "Cairo",
+        "departure_time": "next month",
+        "constraints": [
+          { "type": "budget", "value": "unrealistic" },
+          { "type": "airline", "value": "Qatar Airways" }
+        ]
+      }
+
+    - Input : "Je voyage depuis Paris avec un chat et 500 € de budget"  
+      Output :
+      {
+        "origin": "Paris",
+        "destination": null,
+        "departure_time": null,
+        "constraints": [
+          { "type": "pet", "value": "chat" },
+          { "type": "budget", "value": "500" }
+        ]
+      }
+
+    - Input : "Train pour Marseille avec 2 euros"
+      Output :
+      {
+        "origin": null,
+        "destination": "Marseille",
+        "departure_time": null,
+        "constraints": [
+          { "type": "budget", "value": "unrealistic" }
+        ]
+      }
+
+    - Input : "Vol à Paris avec 1 euro, en Air France avec prise électrique"
+      Output :
+      {
+        "origin": null,
+        "destination": "Paris",
+        "departure_time": null,
+        "constraints": [
+          { "type": "budget", "value": "unrealistic" },
+          { "type": "airline", "value": "Air France" },
+          { "type": "prise électrique", "value": "true" }
+        ]
+      }
+
+  expected_output: |
+    Return PURE JSON output strictly following the required fields.
+    No additional explanation or formatting outside the JSON.
+
+  output_json: true
+
+user_feedback_task:
+  description: >
+    Analyse le JSON généré par la tâche 'query_refinement_task' :
+    {analysis_output}
+
+    Ta mission est en trois étapes :
+
+    1. **Détecte** tous les champs ayant une valeur `"null"` ou `"unrealistic"` :
+       - Champs principaux : `origin`, `destination`, `departure_time`
+       - Contraintes : chaque `constraints[].value` (comme `"budget"`, `"airline"`, `"transport_mode"`, etc.)
+
+    2. Pour chaque champ invalide détecté :
+      - Si la valeur est **"null"** :
+         - Explique brièvement pourquoi cette information est indispensable.
+         - Génère une **question claire** et directe à poser à l’utilisatrice.
+         - Exemple : "Quel est votre lieu de départ ?"
+
+      - Si la valeur est **"unrealistic"** :
+         - N’affiche jamais la valeur initiale jugée irréaliste.
+         - Explique pourquoi elle est irréaliste **en utilisant tes connaissances du monde réel** (tarifs, distances, horaires...).
+         - Fournis une **recommandation réaliste adaptée au contexte**.
+           - Par exemple, pour un budget trop bas, propose une fourchette de prix plausible.
+           - Pour une compagnie ou un mode de transport incompatible avec les villes citées, explique pourquoi.
+
+         - Si le champ concerné est `departure_time` :
+           - ⚠️ Tu ne dois poser une **nouvelle question de date** **qu’après avoir obtenu une valeur pour `origin`**.
+           - Une fois l’origine connue, utilise l’outil `validate_datetime_in_city` **uniquement pour obtenir la date et l’heure actuelles** à ce lieu.
+           - Informe l’utilisatrice de cette date actuelle, puis demande-lui une date future réaliste.
+             Exemple : « Il est actuellement 2025-06-05 à 13:48 à Rabat. À quelle date et heure souhaitez-vous voyager ? »
+           - Si l’origine reste inconnue, indique simplement la date actuelle en UTC, et demande une date future raisonnable.
+
+         ⚠️ Tu ne dois jamais revalider la nouvelle date proposée. Pose une question claire, et collecte uniquement la réponse.
+
+    3. **Collecte** les réponses saisies par l’utilisatrice (via terminal) et remplis le champ `responses`.
+
+    🔁 Tu ne modifies jamais directement les champs du JSON.
+    Tu détectes, tu expliques, tu questionnes, tu collectes.
+    Adapte toujours tes messages au contexte exact du trajet. Ne propose jamais d’exemple générique.
+
+    Exemple de résultat attendu :
+
+    {
+      "missing_or_unrealistic_fields": ["origin", "departure_time", "budget"],
+      "messages": [
+        "Quel est votre lieu de départ ?",
+        "La date indiquée est déjà dépassée à Marseille. Nous sommes actuellement le 2025-06-05 à 14:12 à Marseille. Veuillez proposer une date future à laquelle vous souhaitez voyager.",
+        "Un vol entre Marseille et Rabat coûte généralement entre 300 et 600 euros. Quel budget réaliste souhaitez-vous indiquer ?"
+      ],
+      "responses": {
+        "origin": "Rabat",
+        "departure_time": "2025-07-02T10:00:00",
+        "budget": "400"
+      }
+    }
+
+    Si tous les champs sont valides (aucun "null" ni "unrealistic") :
+
+    {
+      "missing_or_unrealistic_fields": [],
+      "messages": [],
+      "responses": {}
+    }
+
+  expected_output: >
+    Un JSON contenant trois éléments :
+    - `missing_or_unrealistic_fields` : liste des champs invalides détectés
+    - `messages` : les questions personnalisées à poser à l’utilisatrice
+    - `responses` : dictionnaire des réponses fournies, par champ
+
+  output_json: true
+
+finalize_query_task:
+  description: >
+    Cette tâche combine deux sources :
+    1. Le JSON généré automatiquement par la tâche `query_refinement_task` :
+       {analysis_output}
+    2. Le JSON contenant les réponses utilisateur collectées via `user_feedback_task` :
+       {feedback_output}
+
+    🎯 Objectif : produire une requête finale **complète et propre**, avec tous les champs remplis et aucune valeur `"null"` ou `"unrealistic"`.
+
+    ▶️ Étapes :
+
+    1. **Remplacer les champs principaux si une réponse a été donnée** :
+       - Pour `origin`, `destination` ou `departure_time` :
+         - Si une réponse existe dans `feedback_output["responses"]`, **remplace la valeur dans `analysis_output`** par celle-ci.
+
+    2. **Mettre à jour les contraintes** :
+       - Pour chaque entrée dans `feedback_output["responses"]` qui **correspond à une contrainte** (ex: `budget`, `airline`, `transport_mode`, etc.) :
+         - Trouve la contrainte correspondante dans `analysis_output["constraints"]` et **remplace sa `value`** par la nouvelle.
+         - Si la contrainte n'existait pas encore, tu peux **l'ajouter**.
+
+    3. **Filtrer les contraintes finales** :
+       - Ne conserve que les contraintes dont `value` est **ni `"null"` ni `"unrealistic"`**.
+       - Supprime toutes les contraintes vides ou invalides.
+
+    🧱 Structure finale attendue :
+    {
+      "origin": "string",  // toujours rempli
+      "destination": "string",  // toujours rempli
+      "departure_time": "string",  // toujours rempli
+      "constraints": [
+        {"type": "string", "value": "string"},
+        ...
+      ]
+    }
+
+    ✅ Exemple :
+
+    - `analysis_output` :
+      {
+        "origin": "Paris",
+        "destination": null,
+        "departure_time": "demain",
+        "constraints": [
+          {"type": "budget", "value": null},
+          {"type": "airline", "value": "Air France"}
+        ]
+      }
+
+    - `feedback_output` :
+      {
+        "responses": {
+          "destination": "Londres",
+          "budget": "500"
+        }
+      }
+
+    - Résultat attendu :
+      {
+        "origin": "Paris",
+        "destination": "Londres",
+        "departure_time": "demain",
+        "constraints": [
+          {"type": "budget", "value": "500"},
+          {"type": "airline", "value": "Air France"}
+        ]
+      }
+
+  expected_output: >
+    Un JSON final complet, sans valeurs nulles ou irréalistes, prêt à être utilisé par le système de recommandation.
+
+  output_json: true

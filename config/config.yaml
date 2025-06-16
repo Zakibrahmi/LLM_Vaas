@@ -4,8 +4,8 @@ Huggingface:
   timeout: 30
   temperature: 0.7
 OpenAI:
-  key: "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"
-  model: "openai/gpt-4"
+  key: "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"
+  model: "openai/gpt-4o-mini"
   timeout: 30
   temperature: 0.7
 MLModel_path: "./ML_models/models/bidirectionalLSTM.h5"

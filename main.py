@@ -1,91 +1,104 @@
-from crewai import Agent, Crew, Task
-from typing import Dict, Any
-import yaml
+from crewai import Crew, CrewOutput
+from task_VaaS import VaaSTasks
+from vaas_agents import VaaSAgents
 import json
-from textwrap import dedent
-from task_VaaS import *
-from vaas_agents import *
-from tools.scope_agent_toosl import *
-from shemas.shemas import *
 
-class VaaSCrew:
-    def __init__(self, query: str=None):
-        self.query = query
 
-    def run(self) -> Dict[str, Any]:
+class ComposerCrew:
+    def __init__(self, final_query: dict, vaas: list, regions: list):
+        self.final_query = final_query
+        self.vaas = vaas
+        self.regions = regions
+
+    def objective(self) -> str:
         agents = VaaSAgents()
         tasks = VaaSTasks()
-        
-        # Agent coordiator 
-        coordinator_agent = agents.create_agent(agent_name="coordinator")
-        # Task for coordinator agent
-        query_task = tasks.create_task(task_name= "query_refinement_task", agent=coordinator_agent, output=QueryAnalysisOutput)
-
-        crew = Crew(
-            agents=[coordinator_agent],
-            tasks=[query_task]
-        )
-        result = crew.kickoff(inputs={"query": "I want to travel to Jeddah under 5 Riyals"})
-
-        print("Analysis Results:")
-        print(result)
-        
-        """
-        # SmartScope Agent. Responsable on extract relavant regions and VaaS to user query
-        extract_samples_tool = ExtractSamplesTool()
-        ml_model_tool = MLModelTool()
-        SmartScope_Agent= agents.create_agent(agent_name="smartScope", tools=[extract_samples_tool,ml_model_tool])
-        analysis_task= tasks.create_task(task_name="analysis_task", 
-                                      agent=SmartScope_Agent, 
-                                      agent_name="smartScope"                                                                            
-                                      )
-        ml_prediction_task = tasks.create_task(task_name="ml_prediction_task", 
-                                      agent=SmartScope_Agent, 
-                                      agent_name="smartScope"                                                                            
-                                      )
-        ml_prediction_task.async_execution=False
-        ml_prediction_task.context = [analysis_task]
-       
-        
-        crew = Crew(
-            agents=[SmartScope_Agent],
-            tasks=[analysis_task, ml_prediction_task]
-        )
-        result = crew.kickoff(inputs={
-            "target_datetime": "2018-08-03 20:00:00",
-            "num_samples": 5,
-            "column": "date_time"  # Can be changed to other timestamp columns
+        composer = agents.create_agent(agent_name="composer")
+        task = tasks.create_task("objective_function_task", agent=composer, output=None)
+        crew = Crew(agents=[composer], tasks=[task], verbose=True)
+        result: CrewOutput = crew.kickoff(inputs={
+            "final_query": self.final_query,
+            "vaas": self.vaas,
+            "regions": self.regions
         })
+        return str(result.tasks_output[0])
 
-        print("Analysis Results:")
-        print(result)
-        
-       # return coordinator_agent.last_step_output
-       """
+    def generate_code(self, objective_description: str) -> str:
+        agents = VaaSAgents()
+        tasks = VaaSTasks()
+        composer = agents.create_agent(agent_name="composer")
+        task = tasks.create_task("generate_code_task", agent=composer, output=None)
+        crew = Crew(agents=[composer], tasks=[task], verbose=True)
+        result: CrewOutput = crew.kickoff(inputs={
+            "objective_description": objective_description,
+            "vaas": self.vaas
+        })
+        return str(result.tasks_output[0])
+
+    def execute_optimization(self, generated_code: str) -> str:
+        agents = VaaSAgents()
+        tasks = VaaSTasks()
+        composer = agents.create_agent(agent_name="composer")
+        task = tasks.create_task("run_optimizer_task", agent=composer, output=None)  # NOM corrigé
+        crew = Crew(agents=[composer], tasks=[task], verbose=True)
+        result: CrewOutput = crew.kickoff(inputs={
+            "generated_code": generated_code
+        })
+        return str(result.tasks_output[0])
+
+    def recommend_solution(self, optimization_result: str) -> str:
+        agents = VaaSAgents()
+        tasks = VaaSTasks()
+        composer = agents.create_agent(agent_name="composer")
+        task = tasks.create_task("final_recommendation_task", agent=composer, output=None)  # NOM corrigé
+        crew = Crew(agents=[composer], tasks=[task], verbose=True)
+        result: CrewOutput = crew.kickoff(inputs={
+            "final_query": self.final_query,
+            "optimization_result": optimization_result,
+            "vaas": self.vaas
+        })
+        return str(result.tasks_output[0])
+
 
 if __name__ == "__main__":
-    v = VaaSCrew()
-    v.run()
+    final_query = {
+        "origin": "Paris",
+        "destination": "Nice",
+        "departure_time": "2025-07-01T09:00:00",
+        "constraints": [
+            {"type": "budget", "value": "120"},
+            {"type": "electric_plug", "value": "true"},
+            {"type": "meal", "value": "végétarien"}
+        ]
+    }
 
-    """
-    test_queries = [
-        "I want to go to Berlin next month",
-        "Find me flights under $500",
-        "From Madrid to Rome with pet accommodation"
+    vaas = [
+        {"uid": "X001", "cost": 50, "speed": 90, "coverd_regions": [21, 23], "electric_plug": False, "meal": "standard"},
+        {"uid": "X002", "cost": 60, "speed": 110, "coverd_regions": [22, 24], "electric_plug": True, "meal": "standard"},
+        {"uid": "X003", "cost": 80, "speed": 100, "coverd_regions": [21, 25], "electric_plug": False, "meal": "végétarien"},
+        {"uid": "V001", "cost": 60, "speed": 130, "coverd_regions": [21, 24], "electric_plug": True, "meal": "végétarien"},
+        {"uid": "V002", "cost": 70, "speed": 100, "coverd_regions": [22, 26], "electric_plug": True, "meal": "végétarien"},
+        {"uid": "V003", "cost": 65, "speed": 90, "coverd_regions": [21, 22], "electric_plug": True, "meal": "végétarien"},
+        {"uid": "V004", "cost": 55, "speed": 80, "coverd_regions": [22, 23], "electric_plug": True, "meal": "végétarien"},
+        {"uid": "Z999", "cost": 40, "speed": 120, "coverd_regions": [30, 31], "electric_plug": True, "meal": "végétarien"}
     ]
-    
-    for query in test_queries:
-        print(f"\n{'='*50}\nProcessing query: '{query}'\n{'='*50}")
-        crew = VaaSCrew(query)
-        result = crew.run()
-        
-        print("\nExtracted Data:")
-        print(json.dumps(result.get('extracted_data', {}), indent=2))
-        
-        if messages := result.get('validation_messages', []):
-            print("\nMissing Information:")
-            for msg in messages:
-                print(f"- {msg}")
-        else:
-            print("\nAll required information is complete!")
-    """
+
+    regions = [21, 22]
+
+    crew = ComposerCrew(final_query, vaas, regions)
+
+    print("\n=== 🧠 Étape 1 : Génération de la fonction objectif ===\n")
+    description = crew.objective()
+    print(description)
+
+    print("\n=== 🧩 Étape 2 : Génération automatique du code Python ===\n")
+    code = crew.generate_code(description)
+    print(code)
+
+    print("\n=== ⚙️ Étape 3 : Exécution de l’optimisation ===\n")
+    result = crew.execute_optimization(code)
+    print(result)
+
+    print("\n=== 🎯 Étape 4 : Recommandation finale ===\n")
+    recommendation = crew.recommend_solution(result)
+    print(recommendation)
