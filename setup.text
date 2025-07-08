@@ -7,3 +7,4 @@ to create modular apporach, where each agent and task is a python class:
 code agent using crewAi: https://docs.crewai.com/how-to/coding-agents
 
 To evaluate agent in crewAI: https://docs.crewai.com/how-to/openlit-observability#setup-using-function-arguments
+

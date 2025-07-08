@@ -1,7 +1,6 @@
 from crewai import Crew, CrewOutput
 from task_VaaS import VaaSTasks
 from vaas_agents import VaaSAgents
-import json
 
 
 class ComposerCrew:
@@ -36,21 +35,22 @@ class ComposerCrew:
         return str(result.tasks_output[0])
 
     def execute_optimization(self, generated_code: str) -> str:
-        agents = VaaSAgents()
-        tasks = VaaSTasks()
-        composer = agents.create_agent(agent_name="composer")
-        task = tasks.create_task("run_optimizer_task", agent=composer, output=None)  # NOM corrigé
-        crew = Crew(agents=[composer], tasks=[task], verbose=True)
-        result: CrewOutput = crew.kickoff(inputs={
-            "generated_code": generated_code
-        })
-        return str(result.tasks_output[0])
+            agents = VaaSAgents()
+            tasks = VaaSTasks()
+            composer = agents.create_agent(agent_name="composer")
+            task = tasks.create_task("run_optimizer_task", agent=composer, output=None)
+            crew = Crew(agents=[composer], tasks=[task], verbose=True)
+            result: CrewOutput = crew.kickoff(inputs={
+                "generated_code": generated_code,
+                "vaas": self.vaas
+            })
+            return str(result.tasks_output[0])
 
-    def recommend_solution(self, optimization_result: str) -> str:
+    def final_recommendation(self, optimization_result: str) -> str:
         agents = VaaSAgents()
         tasks = VaaSTasks()
         composer = agents.create_agent(agent_name="composer")
-        task = tasks.create_task("final_recommendation_task", agent=composer, output=None)  # NOM corrigé
+        task = tasks.create_task("final_recommendation_task", agent=composer, output=None)
         crew = Crew(agents=[composer], tasks=[task], verbose=True)
         result: CrewOutput = crew.kickoff(inputs={
             "final_query": self.final_query,
@@ -59,31 +59,39 @@ class ComposerCrew:
         })
         return str(result.tasks_output[0])
 
-
 if __name__ == "__main__":
     final_query = {
-        "origin": "Paris",
-        "destination": "Nice",
-        "departure_time": "2025-07-01T09:00:00",
+        "origin": "Lyon",
+        "destination": "Strasbourg",
+        "departure_time": "2025-10-15T10:30:00",
         "constraints": [
-            {"type": "budget", "value": "120"},
-            {"type": "electric_plug", "value": "true"},
-            {"type": "meal", "value": "végétarien"}
+            {"type": "budget", "value": 120},
+            {"type": "climatisation", "value": True},
+            {"type": "places_min", "value": 3},
+            {"type": "support_velo", "value": True},
+            {"type": "type_energy", "value": "électrique"}
         ]
     }
 
     vaas = [
-        {"uid": "X001", "cost": 50, "speed": 90, "coverd_regions": [21, 23], "electric_plug": False, "meal": "standard"},
-        {"uid": "X002", "cost": 60, "speed": 110, "coverd_regions": [22, 24], "electric_plug": True, "meal": "standard"},
-        {"uid": "X003", "cost": 80, "speed": 100, "coverd_regions": [21, 25], "electric_plug": False, "meal": "végétarien"},
-        {"uid": "V001", "cost": 60, "speed": 130, "coverd_regions": [21, 24], "electric_plug": True, "meal": "végétarien"},
-        {"uid": "V002", "cost": 70, "speed": 100, "coverd_regions": [22, 26], "electric_plug": True, "meal": "végétarien"},
-        {"uid": "V003", "cost": 65, "speed": 90, "coverd_regions": [21, 22], "electric_plug": True, "meal": "végétarien"},
-        {"uid": "V004", "cost": 55, "speed": 80, "coverd_regions": [22, 23], "electric_plug": True, "meal": "végétarien"},
-        {"uid": "Z999", "cost": 40, "speed": 120, "coverd_regions": [30, 31], "electric_plug": True, "meal": "végétarien"}
+        # Région 69 (Lyon)
+        {'uid': 'LY1', 'cost': 40, 'speed': 60, 'emission': 60, 'coverd_regions': [69], 'climatisation': True, 'places_min': 3, 'support_velo': True, 'type_energy': 'électrique'},
+        {'uid': 'LY2', 'cost': 50, 'speed': 80, 'emission': 45, 'coverd_regions': [69], 'climatisation': True, 'places_min': 5, 'support_velo': True, 'type_energy': 'électrique'},
+        {'uid': 'LY3', 'cost': 45, 'speed': 75, 'emission': 50, 'coverd_regions': [69], 'climatisation': True, 'places_min': 4, 'support_velo': True, 'type_energy': 'électrique'},
+        
+        # Région 25 (Besançon)
+        {'uid': 'BS1', 'cost': 38, 'speed': 70, 'emission': 40, 'coverd_regions': [25], 'climatisation': True, 'places_min': 3, 'support_velo': True, 'type_energy': 'électrique'},
+        {'uid': 'BS2', 'cost': 42, 'speed': 85, 'emission': 38, 'coverd_regions': [25], 'climatisation': True, 'places_min': 5, 'support_velo': True, 'type_energy': 'électrique'},
+        {'uid': 'BS3', 'cost': 39, 'speed': 65, 'emission': 43, 'coverd_regions': [25], 'climatisation': True, 'places_min': 3, 'support_velo': True, 'type_energy': 'électrique'},
+
+        # Région 67 (Strasbourg)
+        {'uid': 'ST1', 'cost': 48, 'speed': 85, 'emission': 35, 'coverd_regions': [67], 'climatisation': True, 'places_min': 3, 'support_velo': True, 'type_energy': 'électrique'},
+        {'uid': 'ST2', 'cost': 52, 'speed': 90, 'emission': 37, 'coverd_regions': [67], 'climatisation': True, 'places_min': 4, 'support_velo': True, 'type_energy': 'électrique'},
+        {'uid': 'ST3', 'cost': 50, 'speed': 78, 'emission': 39, 'coverd_regions': [67], 'climatisation': True, 'places_min': 3, 'support_velo': True, 'type_energy': 'électrique'}
     ]
 
-    regions = [21, 22]
+    regions = [69, 25, 67]
+
 
     crew = ComposerCrew(final_query, vaas, regions)
 
@@ -95,10 +103,10 @@ if __name__ == "__main__":
     code = crew.generate_code(description)
     print(code)
 
-    print("\n=== ⚙️ Étape 3 : Exécution de l’optimisation ===\n")
+    print("\n=== ⚙️ Étape 3 : Exécution du code et récupération de la meilleure solution ===\n")
     result = crew.execute_optimization(code)
     print(result)
 
-    print("\n=== 🎯 Étape 4 : Recommandation finale ===\n")
-    recommendation = crew.recommend_solution(result)
+    print("\n=== 💡 Étape 4 : Génération de la recommandation utilisateur finale ===\n")
+    recommendation = crew.final_recommendation(result)
     print(recommendation)

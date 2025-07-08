@@ -1,174 +1,293 @@
 objective_function_task:
   description: >
-    Tu es une experte en optimisation de transport multimodal.
+    Tu es une experte en optimisation de trajets multimodaux, spécialisée dans la modélisation mathématique.
 
-    🎯 Objectif : Formuler une **description textuelle claire et structurée** d’un problème d’optimisation de trajet.
-    Le but est de minimiser **le temps total du trajet** tout en respectant strictement les contraintes de l’utilisatrice.
+    🎯 Objectif : à partir de données structurées (requête utilisateur, liste des VaaS, régions), tu dois formuler **en langage naturel** une **description rigoureuse et bien rédigée** du problème d’optimisation à résoudre.
 
-    Tu ne dois pas générer de code Python ici. Il s’agit uniquement d’une **formulation détaillée** du problème, sous forme de texte bien organisé.
+    ✍️ Cette description est destinée à un générateur de code automatique. Elle doit être :
+    - claire, structurée et professionnelle,
+    - rédigée dans un français fluide (évite les listes mécaniques),
+    - adaptée au contexte concret de la requête.
 
-    === Données disponibles ===
-    - Requête structurée complète : {final_query}
-      • origin (ville de départ)
-      • destination (ville d'arrivée)
-      • departure_time (date/heure ISO complète)
-      • constraints : liste de contraintes (type/valeur)
-    - Liste des VaaS disponibles (modes de transport avec caractéristiques) : {vaas}
-    - Liste ordonnée des régions à traverser : {regions}
+    Tu dois absolument t’appuyer sur :
+    - `{final_query}` : contient `origin`, `destination`, `constraints`, etc.,
+    - `{vaas}` : liste réelle des VaaS (ne jamais inventer d’attribut),
+    - `{regions}` : régions à traverser dans l’ordre.
 
-    === Format attendu de la réponse ===
+    === ✅ Contenu exigé de ta réponse ===
 
-    1. **Objectif** :
-       Décris clairement que l’on souhaite minimiser le **temps total du trajet** pour aller de `origin` à `destination`, en choisissant un VaaS par région qui respecte les contraintes.
+    1. **Objectifs**
+       Décris en introduction ce que l’on cherche à optimiser entre la ville de départ et celle d’arrivée.
+       Explique que le but est de **minimiser trois critères** : le coût global, la durée estimée (via l’inverse des vitesses), et les émissions de CO₂.
+       Précise que ces critères sont **regroupés dans une seule fonction objectif** par une **somme simple non pondérée**.
 
-    2. **Variables de décision** :
-       Indique que pour chaque région à traverser (ex: [10, 12, 13]), il faut sélectionner **un VaaS unique** compatible (couvrant cette région et respectant les contraintes).
+    2. **Variables de décision**
+       Décris que l’on doit sélectionner **exactement un VaaS par région** traversée.
+       Chaque VaaS sélectionné doit :
+       - couvrir la région concernée (`region in coverd_regions`),
+       - respecter **toutes les contraintes utilisateur valides**.
 
-    3. **Contraintes** :
-       Liste les contraintes issues de la requête utilisateur (budget max, wifi requis, prise électrique, accessibilité, etc.).
+    3. **Contraintes**
+       Analyse la requête pour extraire les **contraintes explicites**. Détaille-les **en langage naturel** et avec leurs **valeurs précises**.
+       - Si la contrainte est booléenne, écris : "Chaque VaaS doit être équipé de la climatisation."
+       - Si c’est une contrainte numérique, sauf budget, écris : "Le VaaS doit permettre le transport d’au moins 2 bagages."
+       - Si c’est une contrainte textuelle, écris : "Le repas proposé doit être végétarien."
+       Tous les VaaS qui ne respectent **aucune contrainte** sont **exclus avant optimisation**.
 
-    4. **Fonction objectif (en description)** :
-       Explique que le **temps total** est déterminé à partir des vitesses des VaaSs choisis. Pas besoin de connaître la distance réelle :
-       - Plus un VaaS est rapide, moins il ajoute de temps.
-       - On peut considérer que chaque région ajoute un temps inversement proportionnel à la vitesse du VaaS sélectionné.
+       Si un **budget** est présent, indique clairement :
+       > "Le budget est une borne souple fixée à `X` euros. Une pénalité quadratique est appliquée si le coût total dépasse ce montant."
+       On ne filtre jamais les vaas avec le budget, on applique seulement la pénalité ! 
+       ⚠️ Ne parle pas de budget s’il est absent.
 
-    5. **Type d’optimisation** :
-       Propose un algorithme d’optimisation (MPA, PSO, ACO, GA...) et explique brièvement pourquoi il est adapté pour ce type de problème combinatoire.
+    4. **Fonction objectif**
+       Décris avec rigueur comment la valeur à minimiser est calculée :
+       - addition des coûts (`cost`),
+       - des temps (`1 / speed`),
+       - des émissions (`emission`),
+       - +1_000_000 de pénalité si un VaaS ne couvre pas sa région,
+       - pénalité quadratique `(coût_total - budget)²` si le budget est dépassé (seulement si défini).
+
+       Termine par une **formule explicite** :
+       ```
+       objectif = coût_total + temps_total + émissions_total + pénalités
+       ```
+
+    5. **Type d’optimisation**
+       Propose un **algorithme réel connu**, adapté à une sélection discrète avec contraintes strictes et espace combinatoire.
+       Écris clairement son nom et justifie pourquoi il convient ici.
+
+    ✨ Qualité attendue de rédaction :
+    - Le texte doit être rédigé dans un français fluide et professionnel, sans phrases hachées.
+    - Les formulations doivent être naturelles, variées, et éviter les structures répétitives.
+    - Chaque section doit enchaîner logiquement avec la suivante (cohérence discursive).
+    - Une reformulation mathématique élégante de la fonction objectif est fortement encouragée (ex : formule symbolique en notation claire).
+    - Évite les formulations trop génériques. Utilise toujours les **valeurs exactes** extraites de la requête, sans interprétation ni approximation.
 
   expected_output: >
-    Une description purement textuelle et structurée contenant :
-    - L’objectif global du problème
-    - Les variables de décision
-    - La liste claire des contraintes
-    - Une explication qualitative de la fonction objectif (sans code)
-    - Le type d’algorithme choisi et sa justification
+    Un texte bien rédigé, structuré, professionnel et contextuel, contenant :
+    - Les objectifs optimisés avec précision,
+    - Les variables de décision,
+    - Les contraintes utilisateur détaillées avec leurs vraies valeurs,
+    - La fonction objectif expliquée avec une formule claire,
+    - Le nom explicite d’un algorithme d’optimisation adapté et justifié.
 
 generate_code_task:
   description: |
-    Tu es une développeuse Python spécialisée dans l’optimisation de combinatoire discrète.
+    Tu es une développeuse Python spécialisée dans l’optimisation combinatoire sous contraintes.
 
-    🎯 Objectif : Générer un module Python **exécutable et réaliste** qui applique un algorithme d’optimisation tel qu’indiqué dans la description de la fonction objectif fournie.
+    🎯 Objectif : Générer un module Python **exécutable et réaliste** qui applique un algorithme d’optimisation **strictement identique** à celui spécifié dans la `objective_description`.
 
-    === DONNÉES ENTRANTES (NE PAS MODIFIER NI INVENTER) ===
-    - {objective_description} : une description textuelle claire et structurée du problème, générée par la tâche précédente. Elle contient :
-      • l’objectif global (minimiser le temps de trajet),
-      • les contraintes utilisateur (ex: budget, wifi, animaux, etc.),
-      • le format des variables de décision,
-      • le nom de l’algorithme à utiliser (**à respecter strictement et sans substitution**).
+    === DONNÉES ENTRANTES ===
+    - {objective_description} : description textuelle d’un problème d’optimisation multi-objectif transformé en mono-objectif par une **somme simple non pondérée** de :
+      • coût total,
+      • temps de trajet (1 / vitesse),
+      • émissions de CO₂.
+      Elle contient :
+      • les **contraintes utilisateur** précises à respecter (booléennes, entières, etc.),
+      • la liste **ordonnée** des régions à traverser,
+      • le nom exact de l’**algorithme** à appliquer.
 
-    - {vaas} : une **liste réelle** des VaaSs disponibles avec leurs **attributs exacts**.
-      Cette liste est fournie par l’utilisatrice et tu ne dois **rien modifier, ni recréer**.
-      Tu dois utiliser **exclusivement** cette liste pour construire le code.
+    - {vaas} : la **liste réelle** des VaaS disponibles (pas d’invention, pas d’hallucination).
 
-    ❗ Règles strictes :
-    - Tu dois impérativement utiliser **l’algorithme explicitement mentionné** dans `objective_description`. Aucun remplacement ni défaut n’est toléré.
-    - Tu ne dois jamais créer de VaaS artificiel ni inventer des données.
-    - Tu ne dois ajouter aucune contrainte non présente dans `objective_description`.
-    - Tu ne dois pas halluciner de champs comme `accessibilite` ou autres attributs non fournis.
+    === RÈGLES STRICTES À RESPECTER ===
+    - Tu dois filtrer les VaaS uniquement sur les **contraintes métier explicites** (climatisation, support vélo, etc.).
+    - ⚠️ **Ne jamais filtrer les VaaS sur la base du coût** : le budget est géré exclusivement par la **pénalité quadratique dans la fonction `objective_function()`**.
+    - Les individus manipulés par l’algorithme sont toujours des **listes plates d’indices locaux** `[0, 1, 0]`.
+    - Le module ne doit contenir **aucun appel direct à `__main__`**.
+    - Tu dois **respecter à la lettre** l’algorithme mentionné, sans substitution.
+    - ⚠️ Dans la fonction `objective_function()`, la vérification de couverture régionale doit être faite **en parcourant `resolved_indices`**, pas avec les indices locaux.
+    Exemple  de la boucle correcte: 
+    ```python
+    for region, global_index in zip(regions, resolved_indices):
+    if region not in vaas[global_index]["coverd_regions"]:
+        penalty += 1e6
+      ```
+    - Le résultat final de `optimize()` doit être :
+      ```python
+      {
+        "best_score": float,
+        "best_solution": list[int]  # indices locaux
+      }
+      ```
+    - Tu dois exporter :
+      - `regions_exported = regions`,
+      - `candidates_per_region_exported = {region: liste_indices_globaux}` pour chaque région.
 
-    🛠️ Étapes à suivre :
-    1. Lire et analyser le `objective_description` pour :
-       - Identifier toutes les **contraintes** à appliquer (**en les extrayant textuellement**),
-       - Comprendre la structure attendue de la solution (ex: 1 VaaS par région),
-       - Repérer clairement **l’algorithme d’optimisation à utiliser** (à respecter **strictement**).
+    === 🛠️ ÉTAPES À IMPLÉMENTER ===
 
-    2. Créer une structure `candidates_per_region` :
-       Pour chaque région à traverser, filtrer les VaaSs qui :
-       - couvrent cette région (`if region in vaas['coverd_regions']`),
-       - respectent **toutes les contraintes individuelles** (prise électrique, wifi, repas, animaux, etc.).
-       ⚠️ Ne pas vérifier le budget ici, même s’il est mentionné.
+    1. **Filtrage des VaaS par région** :
+       - Pour chaque région `r` de `regions`, créer `candidates_per_region[r]` contenant les **indices globaux** des VaaS qui :
+         - couvrent `r`,
+         - respectent toutes les contraintes spécifiées (ex: `climatisation == True`, `places_min >= 3`, `support_velo == True`, etc.).
+       - ⚠️ Ne jamais appliquer ici de filtre basé sur un plafond budgétaire.
 
-    3. Définir les fonctions suivantes :
-       - `compute_total_time(x)` : calcule le temps total de trajet comme `1 / vitesse` pour chaque VaaS sélectionné.
-       - `respect_constraints(x)` (**obligatoire**) :
-         - Si un budget est présent dans `objective_description`, vérifier que la somme des `cost` ≤ budget.
-         - Sinon, retourner toujours `True`.
-       - `objective_function(x)` :
-         - Reconstruire la solution à partir des `x[i]` (indices des VaaSs dans `candidates_per_region`),
-         - Si le budget est dépassé (si applicable), retourner `float('inf')`,
-         - Sinon, retourner le résultat de `compute_total_time(x)`.
-
-    4. Implémenter **strictement** l’algorithme spécifié dans `objective_description` :
-       - Les bornes du problème doivent être dynamiques :
-         - `min_bounds = [0] * nombre_de_régions`
-         - `max_bounds = [len(candidates_per_region[region]) - 1 for region in candidates_per_region]`
-
-    5. Fournir une fonction publique :
+       **Exemple conforme :**
        ```python
-       def optimize():
-           # effectue l’optimisation
-           # retourne : {'best_score': ..., 'best_solution': [...]}
+       if (
+           vaa["climatisation"] and
+           vaa["places_min"] >= 3 and
+           vaa["support_velo"] and
+           vaa["type_energy"] == "électrique"
+       ):
+           for region in vaa["coverd_regions"]:
+               if region in candidates_per_region:
+                   candidates_per_region[region].append(idx)
        ```
 
-    ✨ Le module final ne doit pas s’exécuter automatiquement.
-    Il doit uniquement exposer `optimize()` et contenir un code propre, commenté si nécessaire, 100% basé sur les données fournies.
+    2. **Fonctions de composantes** :
+       - `compute_total_cost(indices)`
+       - `compute_total_time(indices)`
+       - `compute_total_emission(indices)`
+       - `objective_function(indices)` :
+         - ⚠️ Reconvertit les indices locaux en VaaS globaux :
+           ```python
+           resolved_indices = [
+               candidates_per_region[region][i]
+               for region, i in zip(regions, indices)
+           ]
+           ```
+         - Tous les calculs doivent utiliser `resolved_indices`.
+         - Re-vérifie la couverture (`region not in vaa["coverd_regions"]`) → pénalité +1e6,
+         - Si un budget est défini → pénalité quadratique (`(coût_total - budget)**2`),
+         - Retourne la **somme unique** : `cost + time + emission + penalty`.
+
+    3. **Implémenter l’algorithme exact** :
+       - Respecte les noms et bornes dynamiques :
+         ```python
+         lb = [0] * len(regions)
+         ub = [len(candidates_per_region[region]) - 1 for region in regions]
+         ```
+       - Applique l’algorithme donné dans la description.
+
+    4. **Fonction `optimize()`** :
+       - Effectue l’optimisation complète.
+       - Retourne : `{"best_score": ..., "best_solution": [indices locaux]}`
+
+    5. **Variables exportées pour exécution postérieure** :
+       ```python
+       regions_exported = regions
+       candidates_per_region_exported = {
+           region: candidates_per_region[region]
+           for region in regions
+       }
+       ```
 
   expected_output: |
-    Un fichier Python autonome contenant :
-    - Les imports nécessaires (en fonction de l’algorithme explicitement demandé),
-    - Les définitions de `compute_total_time`, `respect_constraints`, `objective_function`,
-    - La structure `candidates_per_region` correctement filtrée,
-    - La fonction `optimize()` conforme à l’algorithme exigé,
-    - Aucune ligne de test ou d’exécution directe (`if __name__ == "__main__":` interdit).
+    Un module Python complet contenant :
+    - Les imports nécessaires selon l’algorithme,
+    - La construction de `candidates_per_region` (sans filtrage budgétaire),
+    - Les fonctions métier,
+    - La pénalité quadratique si `budget` est défini,
+    - La fonction `optimize()` qui retourne uniquement les **indices locaux**,
+    - Les variables exportées `regions_exported` et `candidates_per_region_exported`,
+    - Aucun appel à `__main__`.
 
 run_optimizer_task:
-  description: >
-    Tu es une experte en exécution de scripts Python d’optimisation.
+  description: |
+    Tu es une experte en exécution rigoureuse de scripts Python d’optimisation combinatoire.
 
-    🎯 Objectif : À partir d’un **code Python généré dynamiquement** (fourni ci-dessous), tu dois :
-    - l’exécuter dans un environnement contrôlé,
-    - appeler la fonction `optimize()` contenue dans ce code,
-    - récupérer le **résultat brut** retourné par cette fonction.
+    🎯 Objectif : Exécuter **intégralement et exactement** le code Python fourni dans `generated_code`, et retourner **le résultat réel** de l’optimisation, tel que calculé par l’algorithme implémenté.
 
-    === CODE PYTHON ===
+    === CODE PYTHON À EXÉCUTER ===
     {generated_code}
 
-    🛠️ Instructions :
-    1. Ne modifie jamais le code reçu.
-    2. Exécute exactement la fonction `optimize()` dans le code tel quel.
-    3. Récupère et retourne sa sortie **sous forme de JSON**.
+    === DONNÉES DISPONIBLES ===
+    {vaas}
 
-    ✅ Format attendu :
+    === ⚠️ INSTRUCTIONS STRICTES ===
+    - Exécute **le code tel quel**, sans y apporter aucune modification.
+    - Appelle la fonction `optimize()` définie dans le code.
+    - Ne réinterprète **jamais** les résultats calculés, ne fais **aucune correction manuelle**.
+    - Les pénalités (y compris celles liées au budget, à la couverture, ou aux préférences) sont **déjà incluses dans `objective_function()`**.
+    - Tu dois donc utiliser **le score retourné tel quel**, même s’il est pénalisé.
+
+    🛠️ Étapes obligatoires :
+    1. Exécute le code Python fourni (il contient l’implémentation complète).
+    2. Appelle la fonction `optimize()` → elle retourne un dictionnaire :
+       ```python
+       {"best_score": float, "best_solution": list[int]}
+       ```
+    3. Récupère aussi les variables exportées dans le code :
+       - `regions_exported` : liste des régions traversées dans l’itinéraire.
+       - `candidates_per_region_exported` : dictionnaire `{region: [indices globaux]}`.
+
+    4. Pour chaque `i, local_index` dans `best_solution`, fais :
+       ```python
+       region = regions_exported[i]
+       global_index = candidates_per_region_exported[region][local_index]
+       uid = vaas[global_index]["uid"]
+       ```
+
+    5. Retourne un dictionnaire final **strictement conforme** à ce format :
+
+       ```json
+       {
+         "best_score": <float>,
+         "best_solution": ["uid1", "uid2", ...]
+       }
+       ```
+
+    ✅ Contraintes importantes :
+    - N’ajoute **aucun post-traitement**, ne modifie pas la solution.
+    - Ne filtre **aucune contrainte** ici : tout est déjà pris en compte dans la fonction objectif.
+    - Accepte les résultats tels quels, même si le score est mauvais à cause de fortes pénalités.
+
+  expected_output: |
+    Un JSON au format :
     {
-      "best_score": <valeur numérique (float)>,
-      "best_solution": [liste de uid sélectionnés pour chaque région]
+      "best_score": float,
+      "best_solution": [list of string UIDs]
     }
-
-  expected_output: >
-    Un JSON contenant :
-    - `best_score` (float) : score total optimisé
-    - `best_solution` (list[str]) : les identifiants des VaaSs sélectionnés, un par région
-
+    Ces données doivent être **strictement** issues du code exécuté, sans correction ni modification.
 
 final_recommendation_task:
   description: >
     Tu es une experte en recommandations personnalisées de transport multimodal.
 
-    🎯 Objectif : Générer un **texte fluide et professionnel** qui recommande un itinéraire optimisé à l’utilisatrice.
+    🎯 Objectif : Générer un **texte fluide, naturel et professionnel** qui recommande un itinéraire optimisé à l’utilisatrice, à condition que tous les VaaSs choisis respectent strictement ses contraintes (à l’exception du budget).
 
-    === DONNÉES ===
+    === DONNÉES DISPONIBLES ===
     - Requête de l’utilisatrice : {final_query}
     - Résultat d’optimisation : {optimization_result}
     - Liste des VaaSs disponibles : {vaas}
 
     🧩 Ta mission :
-    1. Récupère les `uid` des VaaSs optimaux dans `best_solution`.
-    2. Pour chaque `uid`, cherche dans la liste `vaas` les caractéristiques correspondantes : vitesse, coût, repas, prise électrique, etc.
-    3. Résume les caractéristiques globales de la solution (coût total, respect des contraintes…).
-    4. Génère un paragraphe clair, chaleureux et synthétique contenant :
-       - l’objectif atteint (minimisation du temps total),
-       - les VaaSs sélectionnés (nom + description synthétique),
-       - la date/heure de départ,
-       - les contraintes respectées,
-       - la valeur de `best_score` (temps total optimisé).
+    1. Vérifie si une solution est disponible :
+       - Si `best_solution` est vide ou manquante, explique simplement qu’aucune combinaison réalisable n’a été trouvée avec les contraintes imposées.
+       - Sinon, récupère les VaaSs correspondants à partir de leurs `uid`.
 
-    ✅ Interdictions :
-    - Ne jamais réinterpréter les contraintes si elles ne sont pas respectées.
-    - Ne jamais modifier le résultat ou inventer de nouveaux VaaSs.
+    2. Vérifie les contraintes :
+       - Pour chaque VaaS sélectionné, vérifie individuellement s’il respecte **toutes les contraintes** présentes dans `final_query["constraints"]`, **à l’exception du budget**.
+       - Règles :
+         - Une contrainte de type booléen ou string est respectée si la valeur dans le VaaS est **exactement égale** à celle attendue.
+         - Une contrainte numérique est respectée si la valeur dans le VaaS est **supérieure ou égale** à celle attendue (ex: `"baggage": 2` est respectée par un VaaS avec `baggage = 3`).
+
+    3. Rédige la recommandation finale :
+       - Si **toutes les contraintes sont respectées** :
+         - Rédige un **paragraphe professionnel** présentant l’itinéraire proposé, les VaaSs choisis, leurs principales caractéristiques (coût, vitesse, émissions…).
+         - Calcule le **coût total** de l’itinéraire.
+         - Gestion du budget :
+           - Si un budget est présent dans `final_query["constraints"]` :
+             - Si le coût total dépasse ce budget, indique-le clairement dans le paragraphe (ex: « le coût total de X € dépasse votre budget de Y € »).
+             - Sinon, indique que le coût est conforme au budget.
+           - Si aucun budget n’a été spécifié, indique simplement le coût total sans commentaire.
+       - Si **au moins une contrainte est violée** :
+         - Rédige un **paragraphe fluide et clair** expliquant que certaines contraintes n’ont pas été respectées.
+         - Précise dans le texte **quelles contraintes sont violées** et **par quels VaaSs**, sans liste technique (✅/❌).
+         - Termine par une **invitation ouverte** à relancer une recherche avec des critères plus souples (ex: « Souhaitez-vous relancer une recherche avec des contraintes assouplies ? »).
+
+    ✅ Règles strictes :
+    - Ne jamais valider une solution partielle.
+    - Ne jamais inventer de VaaS ni modifier les données.
+    - Être transparente, factuelle et bienveillante dans tous les cas.
+    - Le dépassement du budget **n’invalide pas** la solution, mais doit être mentionné.
 
   expected_output: >
-    Un paragraphe clair et professionnel expliquant :
-    - les VaaSs choisis (uid + caractéristiques clés),
-    - que l’objectif de minimisation du temps a été atteint,
-    - que toutes les contraintes ont bien été respectées,
-    - avec un ton positif et engageant pour l’utilisatrice.
+    🔸 Si la solution est valide :
+    - Un **paragraphe clair, positif et professionnel** recommandant l’itinéraire optimisé.
+    - Présentation des VaaSs sélectionnés (nom, coût, vitesse, émissions…).
+    - Mention du coût total et, **si applicable**, du dépassement du budget.
+
+    🔸 Sinon :
+    - Un **paragraphe fluide** expliquant les contraintes non respectées, avec les VaaSs concernés.
+    - Une **invitation à ajuster les critères** pour relancer une recherche.

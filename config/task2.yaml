@@ -69,7 +69,6 @@ query_refinement_task:
   async_execution: false
   human_input: true
 
-
 analysis_task:
   description: >
     Analyze our time series data by extracting {num_samples} records 
@@ -83,13 +82,13 @@ analysis_task:
         "reference_datetime": "{target_datetime}",
         "num_samples": "{num_samples}"
       }
+
 ml_prediction_task:
   description: >
       Take the time series data from the previous analysis formatted as DataFrame. 
       The input will be the output from the analysis_task.
   expected_output: > 
       forcated trafic volume
-
 
 query_refinement_task:
   description: >
