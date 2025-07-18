@@ -10,3 +10,6 @@ OpenAI:
   temperature: 0.7
 MLModel_path: "./ML_models/models/bidirectionalLSTM.h5"
 data_path: "./data/MITVolume_cleaned.csv"
+
+AgentOps:
+  key: "a23b25e5-9648-439b-a715-ce344340b7f9"

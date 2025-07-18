@@ -70,27 +70,31 @@ class VaaSCrew:
         return result.json_dict
 
 if __name__ == "__main__":
-    raw = input("✈️  Dites-moi votre requête de voyage : ")
+    raw = input("✈️  Please tell me your travel request : ")
     shell = VaaSCrew(raw)
 
-    # Étape 1 : Extraction automatique de la requête
+    # Étape 1 : Extraction automatique
     extracted = shell.extract()
 
-    # Étape 2 : Détection des infos manquantes ou irréalistes
+    # Étape 2 : Détection des infos manquantes
     feedback_output = shell.feedback(extracted)
 
-    # Étape 3 : Interaction terminale pour compléter les infos
+    # Étape 3 : Interaction utilisateur
     responses = {}
-    for field, question in zip(feedback_output["missing_or_unrealistic_fields"], feedback_output["messages"]):
-        answer = input(f"❓ {question} ")
+    fields = feedback_output["missing_or_unrealistic_fields"]
+    questions = feedback_output["messages"]
+
+    for field, question in zip(fields, questions):
+        answer = input(f"❓ {question.strip()} ").strip()
         responses[field] = answer
+
     feedback_output["responses"] = responses
 
     print("\n📋 Résultat complet de user_feedback_task :")
     print(json.dumps(feedback_output, indent=2, ensure_ascii=False))
 
-    # Étape 4 : Fusion finale des infos dans un JSON complet
+    # Étape 4 : Finalisation
     final_result = shell.finalize(extracted, feedback_output)
 
-    print("\n✅ Requête structurée complète :")
+    print("\n✅ Complete structured query :")
     print(json.dumps(final_result, indent=2, ensure_ascii=False))

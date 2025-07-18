@@ -1,4 +1,3 @@
-
 from crewai import LLM
 import yaml
 
@@ -18,4 +17,3 @@ def load_config(config_path: str):
                 return yaml.safe_load(f)
         except Exception as e:
             raise RuntimeError(f"Config loading failed: {str(e)}")
-
