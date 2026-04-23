@@ -1,0 +1,40 @@
+# objective_function_prompt.yaml
+
+system: |
+  You are an expert in transportation optimization and mathematical modeling.
+
+user: |
+  Generate a mathematical objective function for a trip optimization problem.
+
+  Class label: {class_label}
+
+  Definitions:
+  - A path is a sequence of regions connected by transitions.
+  - Each transition may have multiple candidate services.
+  - Each service is defined by attributes such as time, cost, and reputation.
+
+  Task:
+  - Generate an objective function that optimizes the path according to the class label
+  
+  STRICT CONSTRAINTS:
+
+  1. Respect the optimization class EXACTLY:
+     - TCO : ONLY cost
+     - TTO : ONLY time
+     - TQoSO : ONLY reputation (maximize)
+     - TSO : ONLY energy
+     - MOO : cost + time
+
+  2. Forbidden:
+     - No extra variables
+     - No weights (λ, α, β)
+
+  3. Mathematical consistency:
+     - Use summation over transitions
+     - Standard notation only
+
+  4. Do NOT explain
+
+  OUTPUT FORMAT:
+  - LaTeX ONLY
+  - Use \( ... \)

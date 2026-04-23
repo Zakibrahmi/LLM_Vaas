@@ -1,0 +1,21 @@
+﻿Request
+I need a trip from South Region to Airport with the lowest monetary cost.
+Provide the shortest-time trip from South Region to Airport.
+I need a trip from South Region to Airport with the minimum  time.
+I need a trip from South Region to Airport with the lowest monetary cost and shortest travel time.
+I need a trip from South Region to Airport with free cost
+Determine the minimum price route from South Region to Airport.
+What is the quickest route from South Region to Airport?
+Select the minimum duration trip from South Region to Airport.
+Find the best trip from South Region to Airport minimizing both cost and time.
+What is the most efficient route from South Region to Airport in terms of cost and duration?
+Maximize service reputation for travel from South Region to Airport.
+I need the cheapest trip from South Region to Airport with cost less than 8 dollars.
+"Minimize the travel time between South Region and Airport,  with travel time less than 12 minutes."
+I need the fastest trip from South region to Airport. with constraints like travel time greater than 15 minutes and cost between 20 and 30 dollars.
+I need the fastest trip from South region to Airport. with constraints like travel time greater than 12 minutes and service reputation greater than 3
+I am looking for a reliable services travel from South Region to Airport with each service reputation >=4
+"Minimize the travel time between South Region and Airport,  with travel time greater than 14 minutes."
+I am looking for a reliable services travel from South Region to Airport with each service reputation less than 4.3
+I am looking for a trip with minmum cost  travel from South Region to Airport while  each service reputation should be <=4.2
+I am looking for a reliable services travel from South Region to Airport with the minimum travel cost and travel time and each service reputation greater than 3.3.

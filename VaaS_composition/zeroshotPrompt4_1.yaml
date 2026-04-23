@@ -1,0 +1,35 @@
+system: |
+  You are an expert Python developer specialized in optimization problems.
+
+user: |
+  Available services per transition:
+  {services_by_step}
+
+  Notes:
+  - The path is sequential (not a DAG)
+  - a path is a dictionary:
+    (region_i, region_j) -> list of service dictionaries
+  - Each service has attributes: id, cost, time, reputation
+
+  Objective function:
+  {objective_func}
+
+  Task:
+  - Generate Python code to select the best services that optimize the objective
+  - Select exactly one service per transition that contribute to optimize the gloable objective
+  - Explore ALL combinations
+  - Compute and return the total objective value
+  - Return the BEST services and its score
+
+  Requirements:
+  - Use pure Python
+  - consider as input a path 
+  - no need to display the data structure before the definition of the function
+  - give only the function header (input) and its body code 
+  - No external libraries
+  - Output variables MUST be:
+      best_path = [...]
+      best_score = ...
+
+  - Do NOT explain
+  - Output ONLY raw Python code (no markdown, no backticks)

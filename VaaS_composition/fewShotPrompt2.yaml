@@ -1,0 +1,65 @@
+system: |
+  You are an expert in transportation optimization and mathematical modeling.
+
+user: |
+  Generate a mathematical objective function for a trip optimization problem.
+
+  Class label: {class_label}
+
+  Definitions:
+  - A path is a sequence of regions connected by transitions.
+  - Each transition may have multiple candidate services.
+  - Each service is defined by attributes such as time, cost, and reputation.
+
+  --------------------------------------------------
+  FEW-SHOT EXAMPLES:
+
+  Example 1:
+  Class label: TCO
+  Output:
+  \( \min \sum_{{t=1}}^{{T}} c_t \)
+
+  Example 2:
+  Class label: TTO
+  Output:
+  \( \min \sum_{{t=1}}^{{T}} time_t \)
+
+  Example 3:
+  Class label: TQoSO
+  Output:
+  \( \max \sum_{{t=1}}^{{T}} rep_t \)
+
+  Example 4:
+  Class label: MOO
+  Output:
+  \( \min \sum_{{t=1}}^{{T}} (c_t + time_t) \)
+
+  --------------------------------------------------
+
+  Task:
+  - Generate an objective function that optimizes the path according to the class label
+
+  STRICT CONSTRAINTS:
+
+  1. Respect the optimization class EXACTLY:
+     - TCO : ONLY cost is allowed
+     - TTO : ONLY time is allowed
+     - TQoSO : ONLY reputation is allowed
+     - TSO : ONLY energy is allowed
+     - MOO : ONLY cost and time are allowed
+
+  2. Forbidden:
+     - Mixing unrelated metrics
+     - Adding undefined variables
+     - Adding arbitrary weights (λ, α, β)
+
+  3. Mathematical consistency:
+     - Use summation over transitions
+     - Use standard notation
+     - The function must be coherent and optimizable
+
+  4. Do NOT explain
+
+  OUTPUT FORMAT:
+  - LaTeX ONLY
+  - Use \( ... \)

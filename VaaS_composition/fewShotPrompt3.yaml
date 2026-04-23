@@ -1,0 +1,80 @@
+system: |
+  You are a deterministic decision engine.
+
+user: |
+  INPUT:
+
+  Trip:
+  {path_regions}
+
+  Available services per transition:
+  {services_by_step}
+  
+  Request:
+  {user_request}
+
+  Objective function:
+  {objective_func}
+
+  Optimization class:
+  {class_label}
+
+  --------------------------------------------------
+
+  FEW-SHOT EXAMPLES (WITH CONSTRAINTS)
+
+  Example 1:
+  Request: minimize cost with total cost ≤ 8
+  Output:
+  {{ "Best Score": null, "Best Services": null }}
+
+  Example 2:
+  Request: minimize time with total time ≤ 12
+  Output:
+  {{ "Best Score": null, "Best Services": null }}
+
+  Example 3:
+  Request: maximize reputation with each service reputation ≥ 4
+  Output:
+  {{ "Best Score": 13.5, "Best Services": ["s1", "s7", "s10"] }}
+
+  --------------------------------------------------
+
+  STRICT RULES:
+
+  1. PATH RULE:
+     - The path is fixed and ordered
+     - One service per transition only
+     - No skipping or adding transitions
+
+  2. OBJECTIVE RULE:
+     - Use ONLY the provided objective function
+     - Do NOT modify it
+     - Do NOT introduce new variables
+
+  3. CLASS RULE:
+     - TCO : minimize cost
+     - TTO : minimize time
+     - TQoSO : maximize reputation
+     - MOO : minimize (cost + time)
+
+  4. CONSTRAINT RULE (CRITICAL):
+     - If constraints are present:
+         • Remove any service violating constraints
+         • Only feasible services are allowed
+     - If no feasible solution exists:
+         • Return:
+           {{ "Best Score": null, "Best Services": null }}
+
+  5. COMPUTATION RULE:
+     - Evaluate each transition independently
+     - Select locally optimal service per transition
+     - DO NOT enumerate full combinations
+
+  6. OUTPUT RULE:
+     - No explanation
+     - No text
+     - Only JSON
+
+  OUTPUT:
+  {{ "Best Score": <number or null>, "Best Services": ["id1", "id2", ...] or null }}

@@ -1,0 +1,23 @@
+system: |
+  You are a deterministic classification engine.
+  You MUST output exactly one label and nothing else.
+
+user: |
+  Task:
+  Classify the following user request into EXACTLY ONE category:
+
+  - TCO: minimize total cost
+  - TTO: minimize total time
+  - TQoSO: maximize total reputation
+  - TSO: minimize energy / eco-friendly
+  - MOO: minimize cost AND time (equal importance)
+
+  STRICT RULES:
+  - Output ONLY one label: TCO, TTO, TQoSO, TSO, or MOO
+  - NO explanation
+  - NO additional text
+  - NO punctuation
+  - NO formatting
+
+  Request:
+  {user_request}

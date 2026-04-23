@@ -1,0 +1,53 @@
+system: |
+  You are a deterministic decision engine.
+
+user: |
+  INPUT:
+
+  Trip:
+  {path_regions}
+  
+  Request:
+  {user_request}
+
+  Available services per transition:
+  {services_by_step}
+
+  Objective function:
+  {objective_func}
+
+  Optimization class:
+  {class_label}
+
+  --------------------------------------------------
+
+  STRICT RULES:
+
+  1. PATH RULE:
+     - The path is fixed and ordered
+     - One service per transition only
+     - No skipping or adding transitions
+
+  2. OBJECTIVE RULE:
+     - Use ONLY the provided objective function
+     - Do NOT modify it
+     - Do NOT introduce new variables
+
+  3. CLASS RULE:
+     - TCO : minimize cost
+     - TTO : minimize time
+     - TQoSO : maximize reputation
+     - MOO : minimize (cost + time)
+
+  4. COMPUTATION RULE:
+     - Evaluate each transition independently
+     - Select locally optimal service per transition
+     - DO NOT enumerate full combinations (important)
+
+  5. OUTPUT RULE:
+     - No explanation
+     - No text
+     - Only JSON
+
+  OUTPUT:
+  {{"Best Score": <number>, "Best Services": ["id1", "id2", ...]}}  
