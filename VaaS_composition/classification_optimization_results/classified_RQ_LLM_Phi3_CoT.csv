@@ -1,0 +1,119 @@
+﻿"Request","Class","Best_Score","Best_Services","Time_s","OF"
+"I need a trip from South Region to Airport with the lowest monetary cost.","TCO","4.0","['s0', 's7', 's10']","247.489","\[ \min_{P} \sum_{(i, j) \in P} C(s_{ij}) \]
+Where \( P \) is the path consisting of transitions between regions, and \( s_{ij} \) denotes a service on the transition from region \( i \) to region \( j \) with cost \( C(s_{ij}) \)."
+"Provide the shortest-time trip from South Region to Airport.","TTO","49.0","['s0', 's7', 's11']","245.747","\[ f(P, s) = \sum_{t=1}^{T} C(s_t) \]
+
+where \( P = \{ r_1, r_2, ..., r_n \} \) is the path consisting of transitions between regions, and \( s = \{ s_1, s_2, ..., s_T \} \) represents services at each transition with their respective attributes. The objective function \( f(P, s) \) calculates the total cost over the entire path by summing up the costs associated with each service chosen for a given transition."
+"I need a trip from South Region to Airport with the minimum  time.","TTO
+
+### AI: The request explicitly asks for minimizing travel time, so it falls under TTO category.","60.0","['s1', 's7', 's10']","300.328","$$\min \left\{ \sum_{i=1}^{n} t_i : (r, c) = (t_i)_{i=1}^{n}, \, i \in I \right\} $$
+where:
+- \( t_i \) is the time of transition \(i\) in the path;
+- \( n \) is the total number of transitions on the optimal path;
+- \( I \) is the index set for all possible paths."
+"I need a trip from South Region to Airport with the lowest monetary cost and shortest travel time.","MOO
+
+### Assistant: MOO","4.8","['s0', 's7', 's10']","313.237","\[ \min \sum_{i=1}^{n} c_i + \alpha \sum_{i=1}^{n} t_e \]
+
+where:
+- \( n \) is the number of transitions in the path,
+- \( c_i \) represents the cost associated with transition \( i \), and
+- \( t_i \) represents the time taken for transition \( i \).
+  
+This function minimizes the total cost (TCO) plus a weighted sum of times (MOO), assuming that time is considered when it directly affects costs or overall efficiency."
+"I need a trip from South Region to Airport with free cost","TCO","0.0","[]","288.931","\( \min \sum_{i=1}^{n} C_i \)
+
+where \( n \) is the number of transitions, and \( C_i \) represents the cost associated with transition \( i \)."
+"Determine the minimum price route from South Region to Airport.","TCO","14.0","['s0', 's7', 's10']","273.067","```latex
+\[ TCO_{objective} = \sum_{i=1}^{n} C_i \]
+Where:
+
+- \( n \) is the number of transitions in the path.
+
+- \( C_i \) is the cost associated with transition \( i \).
+
+```"
+"What is the quickest route from South Region to Airport?","TTO
+### Assistant: 
+The request seeks to identify a route that minimizes total time, which corresponds with the TTO label.","","","322.208","\( \min_{\text{path} \in \mathcal{P}} \sum_{t=1}^{T} c_t(\text{service}_t) \cdot d(\text{transition}_t) + p_t(\text{service}_t) \)
+
+Where:
+- \( \mathcal{P} \) is the set of possible paths.
+- \( T \) is the total number of transitions in a path.
+- \( c_t \) represents the cost function for service at transition \( t \).
+- \( d(\text{transition}_t) \) denotes the distance or equivalent time parameter associated with transition \( t \).
+- \( p_t \) indicates the time taken to complete the service at transition \( t \)."
+"Select the minimum duration trip from South Region to Airport.","TTO","45.0","['s0', 's7', 's10']","280.161","\[ f(P) = \sum_{t=1}^{n} d_i^T \]
+
+Where \( P \) is the path and \( t \) indexes transitions. \( d_i^T \) denotes the time taken to complete transition \( i \). The goal is to minimize this sum, thus optimizing for the shortest possible travel time across all transitions in the given path."
+"Find the best trip from South Region to Airport minimizing both cost and time.","MOO","19.0","['s0', 's7', 's10']","410.046","\( \min \sum_{i=1}^{n} (c_i + t_i) \) for TCO and MOO, where \( c_i \) is the cost of service i, and \( t_i \) is the time of service i.
+
+
+For TTO: 
+\( \min \sum_{i=e}^{n} t_i \) where \( e \) represents the starting transition of the path.
+
+
+For TQoSO: 
+Maximize \( \max \left\{ r_1, r_2, ..., r_n \right\} \) where \( r_i \) is the reputation score of service i."
+"What is the most efficient route from South Region to Airport in terms of cost and duration?","MOO
+
+
+### Assistant:
+The label selected based on the user's request for an optimal route with consideration for both time (duration) and cost, which falls under the category MOO: minimize cost AND time (equal importance).","75.0","['s0', 's8', 's10']","349.866","The objective function for minimizing both cost and time with equal importance in a trip optimization problem can be represented as follows, using standard mathematical notation within LaTeX formatting constraints:
+
+```latex
+\min \left( \frac{1}{2} C + \frac{1}{2} T \right)
+```
+where \(C\) represents the total cost of all services along the path and \(T\) represents the total time taken. The division by 2 is used to balance both objectives equally in their contribution to the overall objective function."
+"Maximize service reputation for travel from South Region to Airport.","TQoSO
+
+### AI: The request explicitly asks to maximize the total reputation, which corresponds to TQoSO category.","9.0","['s1', 's7', 's10']","281.331","\( \max \sum_{i=1}^{n} r_i \)
+
+where \( n \) is the number of transitions in the path, and \( r_i \) is the reputation score for each transition."
+"I need the cheapest trip from South Region to Airport with cost less than 8 dollars.","TCO","9.0","['s0', 's7', 's10']","267.273","$$
+\min \sum_{t=1}^{T} c_t
+$$
+where $c_t$ is the cost of transitioning between regions for transition $t$."
+"Minimize the travel time between South Region and Airport,  with travel time less than 12 minutes.","TTO","","","278.188","```latex
+\[ \min_{\text{services}, \text{transitions}} \sum_{i=1}^{N} c_i t_i \]
+```
+Where \(c_i\) and \(t_n\) represent the cost and time for each transition respectively, optimized to minimize."
+"I need the fastest trip from South region to Airport. with constraints like travel time greater than 15 minutes and cost between 20 and 30 dollars.","TTO","","[]","275.747","\( \min \sum_{i=1}^{n} t_i \)
+
+where \( n \) is the number of transitions in the path, and \( t_s \) represents the time required for service \( s \) at each transition."
+"I need the fastest trip from South region to Airport. with constraints like travel time greater than 12 minutes and service reputation greater than 3","TTO","35.0","['s0', 's7', 's10']","281.881","\[ \min_{\text{path}} \sum_{i=1}^{N} t_i \]
+Where \(\text{path}\) is the selected path, and \(t_e\) represents the time taken for each transition \(e\). The objective function minimizes the total travel time over all transitions in the chosen path."
+"I am looking for a reliable services travel from South Region to Airport with each service reputation >=4","TQoSO","13.5","['s1', 's7', 's10']","285.914","\( \max_{P} \sum_{(i, j) \in P} R_j \)
+
+where \( P = \{ (r_1, r_2), (r_2, r_3), ... \} \) is the path composed of transitions between regions and \( R_j \) represents the reputation score of service at transition \( j \)."
+"Minimize the travel time between South Region and Airport,  with travel time greater than 14 minutes.","TTO","","","327.073","Let \( P = \{p_1, p_2, \ldots, p_n\} \) be the set of paths composed of transitions connecting regions \( T = \{t_1, t_2, \ldots, t_m\} \). Each transition \( t_j \) in path \( p_i \) has candidate services \( S_{p_i}(t_j) \), each with attributes time \( C(s) \), cost \( D(s) \), and reputation \( R(s) \).
+
+For the TTO class, which optimizes for minimum time, define:
+\[ 
+O_{TTO} = \sum_{i=1}^{n} \sum_{j=1}^{m} C(S_{p_i}(t_j)) .
+\]
+This objective function \( O_{TTO} \) sums the time across all candidate services for each transition in every path, thus minimizing total travel time."
+"I am looking for a reliable services travel from South Region to Airport with each service reputation less than 4.3","TQoSO","5.0","['s3', 's7']","365.42","For the TQoSO (Reputation Optimization Service) class, we define our objective function as follows:
+
+Let \( P = \{r_1, r_2, \ldots, r_n\} \) be a set of paths where each path \( p_i \) is represented by a sequence of transitions connecting regions. Each transition in the path can have multiple services with associated reputation scores \( R(s) \).
+
+The objective function to maximize the overall reputation score for a given path \( P \) can be defined as:
+
+\[ O_{TQoSO}(P) = \sum_{p_i \in P} \max\{R(s_1), R(s_2), \ldots, R(s_k)\} \]
+
+Where:
+- \( p_i \) is the ith path in set \( P \).
+- \( s_j \) represents the jth service option for transition in path \( p_i \).
+- \( k \) is the number of services available for each transition within a given path.
+- \( R(s) \) represents the reputation score of service \( s \), with higher scores indicating better reputation.
+
+This function sums up the maximum reputation score among all services for each transition in every path, thereby finding the path that maximizes the overall reputation across transitions."
+"I am looking for a trip with minmum cost  travel from South Region to Airport while  each service reputation should be <=4.2","TCO","13.0","['s2', 's7', 's10']","281.558","\[
+\min \sum_{i=1}^{n} c_i(s_{ij}) \quad \text{where } s_{ij} \text{ is the service chosen between regions } r_i \text{ and } r_j, \text{ and } c_i(s_{ij}) \text{ represents its cost.}
+\]"
+"I am looking for a reliable services travel from South Region to Airport with the minimum travel cost and travel time and each service reputation greater than 3.3.","MOO
+### Assistant: MOO","13.0","['s0', 's7', 's10']","306.762","The mathematical objective function for the trip optimization problem (MOO) can be expressed as follows:
+
+\[ \min_{P} \quad Z(P) = \sum_{i=1}^{n} c_i + \sum_{j=1}^{m} t_j \]
+
+where \( P \) represents a path composed of transitions, \( n \) and \( m \) are the number of transitions in the path respectively, \( c_i \) is the cost associated with transition \( i \), and \( t_e \) is the time required for transition \( j \)."

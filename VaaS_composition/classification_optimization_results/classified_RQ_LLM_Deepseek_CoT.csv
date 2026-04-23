@@ -1,0 +1,55 @@
+﻿Request,Class,Best_Score,Best_Services,Time_s,OF
+I need a trip from South Region to Airport with the lowest monetary cost.,TCO,9,"['s2', 's7', 's10']",110.195,"\[
+\min \sum_{t \in T} c_t
+\]"
+Provide the shortest-time trip from South Region to Airport.,TTO,13,"['s0', 's8', 's11']",113.914,"\[
+\min \sum_{i=1}^{N} t_i
+\]"
+I need a trip from South Region to Airport with the minimum  time.,TTO,13,"['s0', 's8', 's11']",98.463,"\[
+\min \sum_{e \in E} t_e
+\]"
+I need a trip from South Region to Airport with the lowest monetary cost and shortest travel time.,MOO,61,"['s0', 's8', 's11']",80.939,"\[
+\min \left( \sum_{i=1}^{N} c_i, \sum_{i=1}^{N} t_i \right)
+\]"
+I need a trip from South Region to Airport with free cost,TCO,,,78.89,\(\min \sum_{i=1}^{N} \sum_{j=1}^{J_i} c_{ij} x_{ij}\)
+Determine the minimum price route from South Region to Airport.,TCO,9,"['s2', 's7', 's10']",106.707,"\[
+\min \sum_{i=1}^{n} \sum_{s \in S_i} c(s) \cdot x_{i,s}
+\]"
+What is the quickest route from South Region to Airport?,TTO,13,"['s0', 's8', 's11']",41.795,"\[
+\min \sum_{i \in \mathcal{T}} t_i
+\]"
+Select the minimum duration trip from South Region to Airport.,TTO,13,"['s0', 's8', 's11']",63.959,"\[
+\min \sum_{\tau \in T} \sum_{s \in S_\tau} t_{\tau,s} \cdot x_{\tau,s}
+\]"
+Find the best trip from South Region to Airport minimizing both cost and time.,MOO,61,"['s0', 's8', 's11']",72.715,"\[
+\min \sum_{t \in \text{transitions}} \left( \text{cost}_t + \text{time}_t \right)
+\]"
+What is the most efficient route from South Region to Airport in terms of cost and duration?,MOO,61,"['s0', 's8', 's11']",76.157,"\[
+\min \sum_{i=1}^{N} (c_i + t_i)
+\]"
+Maximize service reputation for travel from South Region to Airport.,TQoSO,13.5,"['s1', 's7', 's10']",59.114,"\[
+\max \sum_{t \in \mathcal{T}} \sum_{s \in \mathcal{S}_t} r_{t,s} \, x_{t,s}
+\]"
+I need the cheapest trip from South Region to Airport with cost less than 8 dollars.,TCO,,,86.634,"\[
+\min \sum_{e \in P} \min_{s \in S_e} \text{cost}(s)
+\]"
+"Minimize the travel time between South Region and Airport,  with travel time less than 12 minutes.",TTO,,,63.16,"\[
+\min \sum_{i=1}^{N} t_i
+\]"
+I need the fastest trip from South region to Airport. with constraints like travel time greater than 15 minutes and cost between 20 and 30 dollars.,TTO,40,"['s0', 's8', 's10']",107.188,"\[
+\min \sum_{i=1}^{N} \sum_{s \in S_i} t_{i,s} \cdot x_{i,s}
+\]"
+I need the fastest trip from South region to Airport. with constraints like travel time greater than 12 minutes and service reputation greater than 3,TTO,40,"['s0', 's8', 's10']",86.378,"\[
+\min \sum_{i=1}^{N} \sum_{j \in S_i} t_{ij} x_{ij}
+\]"
+I am looking for a reliable services travel from South Region to Airport with each service reputation >=4,TQoSO,13.5,"['s1', 's7', 's10']",71.428,\[ \max \sum_{t \in T} \sum_{s \in S_t} r_{ts} x_{ts} \]
+"Minimize the travel time between South Region and Airport,  with travel time greater than 14 minutes.",TTO,,,146.252,"\[
+\min \sum_{i=1}^{N} t_i
+\]"
+I am looking for a reliable services travel from South Region to Airport with each service reputation less than 4.3,TQoSO,12.2,"['s4', 's8', 's10']",114.266,\( \max \sum_{i=1}^{n} \sum_{j \in S_i} r_{ij} x_{ij} \)
+I am looking for a trip with minmum cost  travel from South Region to Airport while  each service reputation should be <=4.2,TCO,17,"['s2', 's8', 's10']",77.275,"\[
+\min \sum_{i=1}^{n} \sum_{j \in S_i} c_{i,j} \cdot x_{i,j}
+\]"
+I am looking for a reliable services travel from South Region to Airport with the minimum travel cost and travel time and each service reputation greater than 3.3.,MOO,62,"['s0', 's8', 's10']",87.094,"\[
+\min \sum_{i \in \mathcal{T}} (c_i + t_i)
+\]"

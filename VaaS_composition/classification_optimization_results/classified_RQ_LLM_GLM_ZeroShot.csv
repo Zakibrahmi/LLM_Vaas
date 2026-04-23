@@ -1,0 +1,41 @@
+﻿"Request","Class","Best_Score","Best_Services","Time_s","OF"
+"I need a trip from South Region to Airport with the lowest monetary cost.","TCO","9","['s2', 's7', 's10']","142.198","\( \displaystyle \min \sum_{i \in \mathcal{T}} \sum_{s \in \mathcal{S}_i} c_{i,s}\,x_{i,s} \)"
+"Provide the shortest-time trip from South Region to Airport.","TTO","13","['s0', 's8', 's11']","248.259","\( \min \sum_{i=1}^{n} t_i \)"
+"I need a trip from South Region to Airport with the minimum  time.","TTO","13","['s0', 's8', 's11']","185.036","\( \min \sum_{i=1}^{N} \sum_{j \in S_i} t_{i,j} x_{i,j} \)"
+"I need a trip from South Region to Airport with the lowest monetary cost and shortest travel time.","MOO","61","['s0', 's8', 's11']","180.97","\[
+\min_{x_{e,s}\in\{0,1\}} 
+\left(
+\sum_{e\in E}\sum_{s\in S_e} c_{e,s}\,x_{e,s},
+\;\sum_{e\in E}\sum_{s\in S_e} t_{e,s}\,x_{e,s}
+\right)
+\]"
+"I need a trip from South Region to Airport with free cost","TCO","9","['s2', 's7', 's10']","137.64","\[ \min \sum_{i=1}^{n} c_i \]"
+"Determine the minimum price route from South Region to Airport.","TCO","9","['s2', 's7', 's10']","160.541","$$\min_{s_{i,i+1} \in S_{i,i+1}} \sum_{i=1}^{n-1} c_{i,i+1}(s_{i,i+1})$$"
+"What is the quickest route from South Region to Airport?","TTO","13","['s0', 's8', 's11']","75.155","\[
+\min \sum_{i=1}^{N} \sum_{s \in S_i} t_{i,s}\,x_{i,s}
+\]"
+"Select the minimum duration trip from South Region to Airport.","TTO","13","['s0', 's8', 's11']","112.145","\( \displaystyle \min \sum_{(i,j)\in\mathcal{E}} \sum_{k\in\mathcal{S}_{ij}} t_{ij}^{k}\,x_{ij}^{k} \)"
+"Find the best trip from South Region to Airport minimizing both cost and time.","MOO","61.0","['s0', 's8', 's11']","110.636","$$\min \left( \sum_{i=1}^{n} \sum_{j \in S_i} c_{ij} x_{ij}, \sum_{i=1}^{n} \sum_{j \in S_i} t_{ij} x_{ij} \right)$$"
+"What is the most efficient route from South Region to Airport in terms of cost and duration?","MOO","69.0","['s2', 's7', 's10']","176.25","$$\min_{P, \{s_t\}_{t \in T}} \left( \sum_{t \in T} c(s_t), \sum_{t \in T} t(s_t) \right)$$"
+"Maximize service reputation for travel from South Region to Airport.","TQoSO","13.5","['s1', 's7', 's10']","61.865","\[
+\max_{x_{i,j}} \sum_{i=1}^{N} \sum_{j} R_{i,j} \cdot x_{i,j}
+\]
+
+Subject to:
+\[
+\sum_{j} x_{i,j} = 1 \quad \forall i \in \{1,2,\ldots,N\}
+\]
+\[
+x_{i,j} \in \{0,1\} \quad \forall i,j
+\]"
+"I need the cheapest trip from South Region to Airport with cost less than 8 dollars.","TCO","","[]","203.537","\( \min \sum_{i=1}^{N} \sum_{j \in S_i} c_{ij} x_{ij} \)"
+"Minimize the travel time between South Region and Airport,  with travel time less than 12 minutes.","TTO","13.0","['s0', 's8', 's11']","116.56","\[
+\text{minimize} \quad \sum_{i=1}^{n-1} \sum_{j=1}^{m_i} T_{ij} x_{ij}
+\]"
+"I need the fastest trip from South region to Airport. with constraints like travel time greater than 15 minutes and cost between 20 and 30 dollars.","TTO","13.0","['s0', 's8', 's11']","107.091","\( \displaystyle \min \sum_{i=1}^{N}\sum_{s\in S_i} \tau_{i,s}\,x_{i,s} \)"
+"I need the fastest trip from South region to Airport. with constraints like travel time greater than 12 minutes and service reputation greater than 3","TTO","70.0","['s4', 's7', 's10']","82.765","$$\min \sum_{i=1}^{n} t_i$$"
+"I am looking for a reliable services travel from South Region to Airport with each service reputation >=4","TQoSO","13.5","['s1', 's7', 's10']","94.09","\( \max \sum_{i=1}^{N} \left( \sum_{s \in S_i} R_{is} x_{is} \right) \)"
+"Minimize the travel time between South Region and Airport,  with travel time greater than 14 minutes.","TTO","23.0","['s0', 's7', 's11']","293.763","\( \min \sum_{i=1}^{N} t_i \)"
+"I am looking for a reliable services travel from South Region to Airport with each service reputation less than 4.3","TQoSO","12.2","['s4', 's8', 's10']","99.023","$$ \max \sum_{i=1}^{n} \text{rep}(s_i) $$"
+"I am looking for a trip with minmum cost  travel from South Region to Airport while  each service reputation should be <=4.2","TCO","17.0","['s2', 's8', 's10']","91.499","\(\min \sum_{i=1}^{N} c_i\)"
+"I am looking for a reliable services travel from South Region to Airport with the minimum travel cost and travel time and each service reputation greater than 3.3.","MOO","62.0","['s0', 's8', 's10']","157.617","\( \displaystyle \min_{y_{t,s}} \big( \sum_{t\in\mathcal{T}}\sum_{s\in\mathcal{S}_t}c_{t,s}\,y_{t,s},\; \sum_{t\in\mathcal{T}}\sum_{s\in\mathcal{S}_t}\tau_{t,s}\,y_{t,s} \big) \)"
