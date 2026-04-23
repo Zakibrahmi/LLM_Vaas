@@ -1,0 +1,60 @@
+📁 Repository Structure
+
+The project is organized as follows:
+
+VaaS/
+│
+├── prompts/
+│   ├── zero_shot_1.yaml
+│   ├── zero_shot_2.yaml
+│   ├── zero_shot_3.yaml
+│   ├── zero_shot_4.yaml
+│   ├── few_shot_1.yaml
+│   ├── few_shot_2.yaml
+│   ├── few_shot_3.yaml
+│   ├── few_shot_4.yaml
+│   ├── cot_1.yaml
+│   ├── cot_2.yaml
+│   ├── cot_3.yaml
+│   ├── cot_4.yaml
+│
+├── VaaS_Classification_Optimization.py
+│   → Main script for running classification and optimization experiments
+│
+├── LLM_Evaluation.py
+│   → Evaluation module for computing performance metrics
+│     (Accuracy, Recall, F1-score, MCC, MAE, Composition Accuracy, AROL)
+│
+└── README.md
+⚙️ Components Overview
+1. Prompt Files (.yaml)
+
+The repository includes 12 structured YAML prompt templates:
+
+Zero-shot prompting (4 files)
+Few-shot prompting (4 files)
+Chain-of-Thought (CoT) prompting (4 files)
+
+Each file defines the input format and instruction templates used to query LLMs.
+
+2. Main Execution File
+VaaS_Classification_Optimization.py
+
+This is the main pipeline of the framework. It:
+
+Loads datasets and prompt templates
+Sends queries to LLMs
+Executes classification and optimization tasks
+Stores raw outputs for evaluation
+3. Evaluation Module
+LLM_Evaluation.py
+
+This script is used to compute evaluation metrics, including:
+
+Classification Accuracy
+Recall
+F1-score
+Matthews Correlation Coefficient (MCC)
+Mean Absolute Error (MAE)
+Composition Accuracy
+AROL (Average Relative Optimization Loss)
